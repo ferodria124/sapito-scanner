@@ -2,315 +2,582 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Escáner SKU – Sapito 3.0</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sapito 3.0">
+  <meta name="theme-color" content="#1a3a2a">
+  <title>Control Sapito 3.0 – Algarrobo</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
     :root {
-      --verde: #1a3a2a;
-      --verde-medio: #2d6a4f;
-      --verde-claro: #40916c;
-      --verde-neon: #74c69d;
+      --verde-oscuro:  #1a3a2a;
+      --verde-medio:   #2d6a4f;
+      --verde-claro:   #40916c;
+      --verde-suave:   #d8f3dc;
+      --verde-pale:    #f0faf3;
+      --verde-neon:    #74c69d;
+      --blanco:        #ffffff;
+      --gris-texto:    #374151;
+      --gris-suave:    #f9fafb;
+      --gris-borde:    #e5e7eb;
+      --sombra:        0 4px 24px rgba(26,58,42,0.10);
+      --radio:         16px;
+      --font:          'Segoe UI', system-ui, -apple-system, sans-serif;
     }
-
+ 
+    html { height: 100%; -webkit-text-size-adjust: 100%; }
+ 
     body {
-      background: #0a0a0a;
-      color: #fff;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      height: 100vh;
-      height: 100dvh;
+      font-family: var(--font);
+      background: linear-gradient(135deg, #e8f5e9 0%, #f0faf3 50%, #e0f2e9 100%);
+      min-height: 100vh;
+      color: var(--gris-texto);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
-
-    /* Header */
+ 
+    /* ── Header ── */
     .header {
-      background: linear-gradient(135deg, var(--verde), var(--verde-medio));
-      padding: 14px 20px;
-      padding-top: calc(14px + env(safe-area-inset-top));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 10;
+      background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
+      box-shadow: 0 4px 20px rgba(26,58,42,0.25);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-inner {
+      max-width: 720px; margin: 0 auto;
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .logo-wrap {
       flex-shrink: 0;
+      background: rgba(255,255,255,0.12);
+      border-radius: 10px; padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.20);
     }
-    .header-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
+    .logo { height: 40px; width: auto; display: block; object-fit: contain; }
+    .header-text { display: flex; flex-direction: column; gap: 2px; }
+    .header-tag { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+    .header-title { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.1; }
+    .header-title .ver { color: var(--verde-neon); }
+    .header-loc { font-size: 12px; color: rgba(255,255,255,0.70); font-weight: 500; }
+ 
+    /* ── Main ── */
+    .main {
+      flex: 1; max-width: 720px; width: 100%;
+      margin: 0 auto; padding: 20px 16px 32px;
+      display: flex; flex-direction: column; gap: 16px;
     }
-    .header-sub {
-      font-size: 11px;
-      color: rgba(255,255,255,0.6);
-      margin-top: 2px;
+ 
+    /* ── Search Card ── */
+    .search-card {
+      background: var(--blanco); border-radius: var(--radio);
+      padding: 20px; box-shadow: var(--sombra);
+      border: 1px solid var(--gris-borde);
     }
-    .btn-cerrar {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
+    .search-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--verde-medio); margin-bottom: 12px;
+    }
+    .search-row { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+    .input-wrap { flex: 1 1 100%; position: relative; order: 1; }
+    .input-icon {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%); font-size: 16px; pointer-events: none;
+    }
+    .search-input {
+      width: 100%; padding: 14px 14px 14px 42px;
+      border: 2px solid var(--gris-borde); border-radius: 12px;
+      font-size: 16px; font-family: var(--font);
+      color: var(--gris-texto); background: var(--gris-suave);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none; -webkit-appearance: none;
+    }
+    .search-input:focus {
+      border-color: var(--verde-claro); background: var(--blanco);
+      box-shadow: 0 0 0 4px rgba(64,145,108,0.12);
+    }
+    .search-input::placeholder { color: #9ca3af; }
+ 
+    /* Suggestions */
+    .suggestions {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: var(--blanco); border: 1.5px solid var(--verde-claro);
+      border-radius: 10px; box-shadow: 0 8px 32px rgba(26,58,42,0.18);
+      z-index: 100; overflow: hidden;
+    }
+    .suggestions.hidden { display: none; }
+    .suggestion-item {
+      padding: 14px 16px; cursor: pointer; font-size: 15px;
+      font-weight: 500; color: var(--verde-oscuro);
+      border-bottom: 1px solid var(--gris-borde);
+      min-height: 44px; display: flex; align-items: center;
       -webkit-tap-highlight-color: transparent;
     }
-
-    /* Visor cámara */
-    .viewport {
-      position: relative;
-      flex: 1;
-      overflow: hidden;
-      background: #000;
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:hover, .suggestion-item.active { background: var(--verde-pale); }
+ 
+    /* Botones */
+    .btn-scanner {
+      padding: 14px; background: var(--gris-suave);
+      border: 2px solid var(--gris-borde); border-radius: 12px;
+      font-size: 22px; cursor: pointer; min-height: 52px; min-width: 52px;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+      order: 2; flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
     }
-
-    #video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .btn-scanner:active { background: var(--verde-suave); border-color: var(--verde-claro); }
+ 
+    .btn-buscar {
+      flex: 1; order: 3;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, var(--verde-medio), var(--verde-claro));
+      color: var(--blanco); border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      min-height: 52px; -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      box-shadow: 0 4px 12px rgba(45,106,79,0.30);
+      transition: transform 0.15s, opacity 0.15s;
     }
-
-    /* Overlay oscuro con ventana central */
-    .overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
+    .btn-buscar:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-buscar:disabled { opacity: 0.6; }
+ 
+    /* ── Resultado ── */
+    .resultado {
+      background: var(--blanco); border-radius: var(--radio);
+      overflow: hidden; box-shadow: var(--sombra);
+      border: 1px solid var(--gris-borde);
+      animation: slideIn 0.3s ease;
     }
+    .resultado.hidden { display: none; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .res-header {
+      background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-medio));
+      padding: 18px 20px; display: flex; align-items: center; gap: 12px;
+    }
+    .res-header-icon { font-size: 20px; }
+    .res-header-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.60); }
+    .res-header-sku { font-size: 18px; font-weight: 800; color: #fff; }
+    .res-body { padding: 20px; }
+    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .res-field {
+      background: var(--gris-suave); border: 1.5px solid var(--gris-borde);
+      border-radius: 12px; padding: 16px;
+    }
+    .res-field.highlight {
+      background: var(--verde-suave); border-color: #95d5b2; grid-column: 1 / -1;
+    }
+    .res-field-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
+    .res-field.highlight .res-field-label { color: var(--verde-medio); }
+    .res-field-value { font-size: 14px; font-weight: 600; color: var(--gris-texto); line-height: 1.4; }
+    .stock-number { font-size: 48px; font-weight: 900; color: var(--verde-oscuro); line-height: 1; }
+    .stock-unit { font-size: 13px; font-weight: 600; color: var(--verde-claro); margin-top: 4px; }
+    .stock-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; }
+    .badge-ok   { background: #d1fae5; color: #065f46; }
+    .badge-low  { background: #fef3c7; color: #92400e; }
+    .badge-zero { background: #fee2e2; color: #991b1b; }
+ 
+    .res-error { padding: 24px 20px; display: flex; align-items: center; gap: 14px; }
+    .error-icon { font-size: 28px; }
+    .error-title { font-size: 15px; font-weight: 700; color: #991b1b; }
+    .error-msg   { font-size: 13px; color: #6b7280; margin-top: 2px; }
+ 
+    .loading { padding: 40px; text-align: center; color: var(--verde-medio); }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--verde-suave); border-top-color: var(--verde-claro);
+      border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+ 
+    .empty-state { text-align: center; padding: 48px 20px; color: #9ca3af; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-text { font-size: 15px; line-height: 1.5; }
+ 
+    .footer {
+      text-align: center; padding: 16px; font-size: 11px; color: #9ca3af;
+      border-top: 1px solid var(--gris-borde); background: var(--blanco);
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+ 
+    /* ── Scanner ── */
+    .scanner-overlay {
+      position: fixed; inset: 0; background: #000;
+      z-index: 999; display: flex; flex-direction: column;
+    }
+    .scanner-overlay.hidden { display: none; }
+    .scanner-header {
+      background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-medio));
+      padding: 16px 20px; padding-top: calc(16px + env(safe-area-inset-top));
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .scanner-title { font-size: 16px; font-weight: 800; color: #fff; }
+    .scanner-sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .btn-cerrar-scanner {
+      background: rgba(255,255,255,0.15); border: none; color: #fff;
+      font-size: 13px; font-weight: 700; padding: 8px 16px;
+      border-radius: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .scanner-viewport { position: relative; flex: 1; overflow: hidden; background: #000; }
+    #scannerVideo { width: 100%; height: 100%; object-fit: cover; }
     .overlay-top    { position: absolute; top: 0; left: 0; right: 0; height: 20%; background: rgba(0,0,0,0.55); }
     .overlay-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: rgba(0,0,0,0.55); }
     .overlay-left   { position: absolute; top: 20%; bottom: 30%; left: 0; width: 8%; background: rgba(0,0,0,0.55); }
     .overlay-right  { position: absolute; top: 20%; bottom: 30%; right: 0; width: 8%; background: rgba(0,0,0,0.55); }
-
-    /* Ventana de escaneo */
-    .scan-window {
-      position: absolute;
-      top: 20%;
-      bottom: 30%;
-      left: 8%;
-      right: 8%;
-      border-radius: 12px;
-    }
-
-    /* Esquinas */
-    .corner {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      border-color: var(--verde-neon);
-      border-style: solid;
-    }
+    .scan-window { position: absolute; top: 20%; bottom: 30%; left: 8%; right: 8%; }
+    .corner { position: absolute; width: 28px; height: 28px; border-color: var(--verde-neon); border-style: solid; }
     .corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 6px 0 0 0; }
     .corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 6px 0 0; }
     .corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 6px; }
     .corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 6px 0; }
-
-    /* Línea de escaneo */
     .scan-line {
-      position: absolute;
-      left: 4px;
-      right: 4px;
-      height: 2px;
+      position: absolute; left: 4px; right: 4px; height: 2px;
       background: linear-gradient(90deg, transparent, var(--verde-neon), transparent);
       box-shadow: 0 0 10px var(--verde-neon);
       animation: scanLine 2s ease-in-out infinite;
     }
     @keyframes scanLine {
-      0%   { top: 8px;  opacity: 0; }
+      0%   { top: 8px; opacity: 0; }
       10%  { opacity: 1; }
       90%  { opacity: 1; }
       100% { top: calc(100% - 8px); opacity: 0; }
     }
-
-    /* Hint texto */
-    .hint {
-      position: absolute;
-      bottom: 32%;
-      left: 0; right: 0;
-      text-align: center;
-      font-size: 13px;
-      color: rgba(255,255,255,0.75);
-      padding: 0 20px;
+    .scan-hint {
+      position: absolute; bottom: 32%; left: 0; right: 0;
+      text-align: center; font-size: 13px; color: rgba(255,255,255,0.75); padding: 0 20px;
     }
-
-    /* Estado / resultado */
-    .status-bar {
-      background: var(--verde);
-      padding: 16px 20px;
+    .scanner-status {
+      background: var(--verde-oscuro); padding: 16px 20px;
       padding-bottom: calc(16px + env(safe-area-inset-bottom));
-      flex-shrink: 0;
-      min-height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
+      flex-shrink: 0; min-height: 70px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
     }
-    .status-icon { font-size: 22px; }
-    .status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
-    .status-text strong { color: #fff; display: block; font-size: 16px; }
-
-    /* Éxito */
-    .success-bar {
-      background: linear-gradient(135deg, #065f46, var(--verde-claro));
-      animation: flashGreen 0.4s ease;
+    .scanner-status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
+    .scanner-status-text strong { color: #fff; display: block; font-size: 16px; }
+    .scanner-status.success { background: linear-gradient(135deg, #065f46, var(--verde-claro)); }
+    .scanner-error {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.88);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 16px; padding: 32px; text-align: center;
     }
-    @keyframes flashGreen {
-      0%   { opacity: 0.3; transform: scale(0.98); }
-      100% { opacity: 1;   transform: scale(1); }
-    }
-
-    /* Error */
-    .error-msg {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      padding: 32px;
-      text-align: center;
-    }
-    .error-msg h2 { font-size: 18px; color: #fca5a5; }
-    .error-msg p  { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+    .scanner-error.hidden { display: none; }
+    .scanner-error h2 { font-size: 18px; color: #fca5a5; }
+    .scanner-error p  { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.5; }
     .btn-reintentar {
-      background: var(--verde-claro);
-      color: #fff;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
+      background: var(--verde-claro); color: #fff; border: none;
+      padding: 12px 28px; border-radius: 12px; font-size: 15px;
+      font-weight: 700; cursor: pointer; margin-top: 8px;
+    }
+ 
+    @media (max-width: 480px) {
+      .res-grid { grid-template-columns: 1fr; }
+      .res-field.highlight { grid-column: 1; }
+      .stock-number { font-size: 52px; }
     }
   </style>
 </head>
 <body>
-
-  <div class="header">
-    <div>
-      <div class="header-title">📷 Escáner SKU</div>
-      <div class="header-sub">Control Sapito 3.0 · Algarrobo</div>
+ 
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo-wrap">
+        <img
+          src="https://via.placeholder.com/140x40/FFFFFF/1a3a2a?text=LOGO"
+          alt="Logo Casaideas" class="logo"
+          onerror="this.style.display='none'"
+        />
+      </div>
+      <div class="header-text">
+        <span class="header-tag">Sistema de Inventario</span>
+        <h1 class="header-title">Control Sapito <span class="ver">3.0</span></h1>
+        <span class="header-loc">📍 Algarrobo</span>
+      </div>
     </div>
-    <button class="btn-cerrar" onclick="cerrar()">✕ Cerrar</button>
-  </div>
-
-  <div class="viewport">
-    <video id="video" autoplay playsinline muted></video>
-
-    <div class="overlay">
+  </header>
+ 
+  <!-- MAIN -->
+  <main class="main">
+    <section class="search-card">
+      <p class="search-label">Ingresa o escanea el SKU</p>
+      <div class="search-row">
+        <div class="input-wrap">
+          <span class="input-icon">🔍</span>
+          <input
+            type="number" inputmode="numeric"
+            id="skuInput" placeholder="Ej: 3218632000115"
+            autocomplete="off" class="search-input"
+          />
+          <div id="suggestions" class="suggestions hidden"></div>
+        </div>
+        <button class="btn-scanner" onclick="abrirScanner()" title="Escanear">📷</button>
+        <button class="btn-buscar" onclick="buscar()">Consultar</button>
+      </div>
+    </section>
+ 
+    <section id="resultado" class="resultado hidden"></section>
+ 
+    <div id="estadoVacio" class="empty-state">
+      <div class="empty-icon">📦</div>
+      <p class="empty-text">Escribe un SKU o escanea el código de barras del producto.</p>
+    </div>
+  </main>
+ 
+  <footer class="footer">
+    Control Sapito 3.0 · Algarrobo &nbsp;·&nbsp; Powered by Google Sheets
+  </footer>
+ 
+  <!-- SCANNER OVERLAY -->
+  <div id="scannerOverlay" class="scanner-overlay hidden">
+    <div class="scanner-header">
+      <div>
+        <div class="scanner-title">📷 Escáner SKU</div>
+        <div class="scanner-sub">Control Sapito 3.0 · Algarrobo</div>
+      </div>
+      <button class="btn-cerrar-scanner" onclick="cerrarScanner()">✕ Cerrar</button>
+    </div>
+    <div class="scanner-viewport">
+      <video id="scannerVideo" autoplay playsinline muted></video>
       <div class="overlay-top"></div>
       <div class="overlay-bottom"></div>
       <div class="overlay-left"></div>
       <div class="overlay-right"></div>
+      <div class="scan-window">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+        <div class="scan-line"></div>
+      </div>
+      <div class="scan-hint">Centra el código de barras dentro del recuadro</div>
+      <div id="scannerError" class="scanner-error hidden">
+        <h2>⚠️ Sin acceso a la cámara</h2>
+        <p>Permite el acceso a la cámara en tu navegador e intenta de nuevo.</p>
+        <button class="btn-reintentar" onclick="iniciarCamara()">Reintentar</button>
+      </div>
     </div>
-
-    <div class="scan-window" id="scanWindow">
-      <span class="corner tl"></span>
-      <span class="corner tr"></span>
-      <span class="corner bl"></span>
-      <span class="corner br"></span>
-      <div class="scan-line"></div>
-    </div>
-
-    <div class="hint">Centra el código de barras dentro del recuadro</div>
-
-    <div id="errorMsg" class="error-msg" style="display:none">
-      <h2>⚠️ Sin acceso a la cámara</h2>
-      <p>Permite el acceso a la cámara en tu navegador e intenta de nuevo.</p>
-      <button class="btn-reintentar" onclick="iniciarScanner()">Reintentar</button>
+    <div class="scanner-status" id="scannerStatus">
+      <span>🔍</span>
+      <span class="scanner-status-text">Buscando código de barras…</span>
     </div>
   </div>
-
-  <div class="status-bar" id="statusBar">
-    <span class="status-icon">🔍</span>
-    <span class="status-text">Buscando código de barras…</span>
-  </div>
-
+ 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.18.6/index.min.js"></script>
   <script>
+    // ── CONFIG ── Reemplaza con tu URL de Google Apps Script
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNRIdcO5bMRIOlEAJExUzzGAmcwwYb9RBgq6b2yh2uQDEd11p-UVjTYvTH71bHnCHw6A/exec';
+ 
+    // ── Estado ──
+    let sugerenciaActiva = -1;
+    let timeoutSugerencias;
     let codeReader = null;
-    let escaneado  = false;
-
-    // Obtener URL de retorno desde parámetro ?back=
-    const params  = new URLSearchParams(window.location.search);
-    const backUrl = params.get('back') || '';
-
-    async function iniciarScanner() {
-      document.getElementById('errorMsg').style.display = 'none';
-      escaneado = false;
-
+    let scannerActivo = false;
+ 
+    // ── DOM ──
+    const input       = document.getElementById('skuInput');
+    const suggestions = document.getElementById('suggestions');
+    const resultado   = document.getElementById('resultado');
+    const estadoVacio = document.getElementById('estadoVacio');
+ 
+    // ── Enter / flechas ──
+    input.addEventListener('keydown', function(e) {
+      const items = suggestions.querySelectorAll('.suggestion-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        sugerenciaActiva = Math.min(sugerenciaActiva + 1, items.length - 1);
+        items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        sugerenciaActiva = Math.max(sugerenciaActiva - 1, -1);
+        items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
+      } else if (e.key === 'Enter') {
+        if (sugerenciaActiva >= 0 && items[sugerenciaActiva]) {
+          input.value = items[sugerenciaActiva].textContent;
+          cerrarSugerencias();
+        }
+        buscar();
+      } else if (e.key === 'Escape') {
+        cerrarSugerencias();
+      }
+    });
+ 
+    // ── Autocompletar ──
+    input.addEventListener('input', function() {
+      clearTimeout(timeoutSugerencias);
+      const val = this.value.trim();
+      if (val.length < 2) { cerrarSugerencias(); return; }
+      timeoutSugerencias = setTimeout(() => {
+        fetch(APPS_SCRIPT_URL + '?action=sugerir&prefijo=' + encodeURIComponent(val))
+          .then(r => r.json())
+          .then(data => mostrarSugerencias(data))
+          .catch(() => cerrarSugerencias());
+      }, 280);
+    });
+ 
+    function mostrarSugerencias(lista) {
+      if (!lista || lista.length === 0) { cerrarSugerencias(); return; }
+      sugerenciaActiva = -1;
+      suggestions.innerHTML = lista.map(s =>
+        `<div class="suggestion-item" onclick="elegirSugerencia('${s}')">${s}</div>`
+      ).join('');
+      suggestions.classList.remove('hidden');
+    }
+ 
+    function elegirSugerencia(sku) {
+      input.value = sku;
+      cerrarSugerencias();
+      buscar();
+    }
+ 
+    function cerrarSugerencias() {
+      suggestions.classList.add('hidden');
+      suggestions.innerHTML = '';
+      sugerenciaActiva = -1;
+    }
+ 
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.input-wrap')) cerrarSugerencias();
+    });
+ 
+    // ── Buscar ──
+    function buscar() {
+      const sku = input.value.trim();
+      if (!sku) { input.focus(); return; }
+      cerrarSugerencias();
+      mostrarLoading();
+ 
+      fetch(APPS_SCRIPT_URL + '?action=buscar&sku=' + encodeURIComponent(sku))
+        .then(r => r.json())
+        .then(data => mostrarResultado(data))
+        .catch(err => mostrarErrorConexion(err));
+    }
+ 
+    // ── Scanner ──
+    function abrirScanner() {
+      document.getElementById('scannerOverlay').classList.remove('hidden');
+      document.getElementById('scannerError').classList.add('hidden');
+      document.getElementById('scannerStatus').className = 'scanner-status';
+      document.getElementById('scannerStatus').innerHTML = '<span>🔍</span><span class="scanner-status-text">Buscando código de barras…</span>';
+      iniciarCamara();
+    }
+ 
+    function cerrarScanner() {
+      scannerActivo = false;
+      if (codeReader) { codeReader.reset(); codeReader = null; }
+      document.getElementById('scannerOverlay').classList.add('hidden');
+    }
+ 
+    async function iniciarCamara() {
+      document.getElementById('scannerError').classList.add('hidden');
+      scannerActivo = true;
+ 
       try {
         codeReader = new ZXing.BrowserMultiFormatReader();
         const devices = await codeReader.listVideoInputDevices();
-
-        if (!devices.length) throw new Error('No se encontró ninguna cámara.');
-
-        // Preferir cámara trasera
-        const camara = devices.find(d =>
-          /back|rear|trasera|environment/i.test(d.label)
-        ) || devices[devices.length - 1];
-
-        await codeReader.decodeFromVideoDevice(
-          camara.deviceId,
-          'video',
-          (result, err) => {
-            if (result && !escaneado) {
-              escaneado = true;
-              const codigo = result.getText();
-              mostrarExito(codigo);
-
-              // Vibrar si el dispositivo lo soporta
-              if (navigator.vibrate) navigator.vibrate(100);
-
-              // Esperar 1 segundo y volver a la app con el código
-              setTimeout(() => {
-                if (backUrl) {
-                  window.location.href = backUrl + '?sku=' + encodeURIComponent(codigo);
-                } else {
-                  // Si no hay URL de retorno, intentar postMessage al padre
-                  window.opener?.postMessage({ sku: codigo }, '*');
-                  window.close();
-                }
-              }, 1200);
-            }
+        if (!devices.length) throw new Error('No hay cámara disponible.');
+ 
+        const camara = devices.find(d => /back|rear|trasera|environment/i.test(d.label))
+                    || devices[devices.length - 1];
+ 
+        await codeReader.decodeFromVideoDevice(camara.deviceId, 'scannerVideo', (result, err) => {
+          if (result && scannerActivo) {
+            scannerActivo = false;
+            const codigo = result.getText();
+            if (navigator.vibrate) navigator.vibrate(100);
+ 
+            const st = document.getElementById('scannerStatus');
+            st.className = 'scanner-status success';
+            st.innerHTML = `<span>✅</span><span class="scanner-status-text"><strong>${codigo}</strong>Consultando bodega…</span>`;
+ 
+            setTimeout(() => {
+              cerrarScanner();
+              input.value = codigo;
+              buscar();
+            }, 800);
           }
-        );
-
+        });
       } catch(err) {
-        document.getElementById('errorMsg').style.display = 'flex';
-        console.error(err);
+        document.getElementById('scannerError').classList.remove('hidden');
       }
     }
-
-    function mostrarExito(codigo) {
-      const bar = document.getElementById('statusBar');
-      bar.className = 'status-bar success-bar';
-      bar.innerHTML = `
-        <span class="status-icon">✅</span>
-        <span class="status-text">
-          <strong>${codigo}</strong>
-          Redirigiendo a la app…
-        </span>`;
+ 
+    // ── Resultados ──
+    function mostrarLoading() {
+      estadoVacio.style.display = 'none';
+      resultado.classList.remove('hidden');
+      resultado.innerHTML = `<div class="loading"><div class="spinner"></div><p>Consultando bodega…</p></div>`;
     }
-
-    function cerrar() {
-      if (codeReader) codeReader.reset();
-      if (backUrl) {
-        window.location.href = backUrl;
+ 
+    function mostrarResultado(data) {
+      if (data.success) {
+        const stock = data.stock;
+        const badge = stock === 0
+          ? `<span class="stock-badge badge-zero">Sin stock</span>`
+          : stock <= 5
+          ? `<span class="stock-badge badge-low">Stock bajo</span>`
+          : `<span class="stock-badge badge-ok">Disponible</span>`;
+ 
+        resultado.innerHTML = `
+          <div class="res-header">
+            <span class="res-header-icon">📦</span>
+            <div>
+              <div class="res-header-label">Producto encontrado</div>
+              <div class="res-header-sku">${esc(data.sku)}</div>
+            </div>
+          </div>
+          <div class="res-body">
+            <div class="res-grid">
+              <div class="res-field highlight">
+                <div class="res-field-label">Descripción SKU</div>
+                <div class="res-field-value">${esc(data.desc) || '<em style="color:#9ca3af">Sin descripción</em>'}</div>
+              </div>
+              <div class="res-field">
+                <div class="res-field-label">Stock en Bodega</div>
+                <div class="stock-number">${stock.toLocaleString('es-CL')}</div>
+                <div class="stock-unit">unidades</div>
+                ${badge}
+              </div>
+              <div class="res-field">
+                <div class="res-field-label">SKU Consultado</div>
+                <div class="res-field-value" style="font-family:monospace;font-size:16px">${esc(String(data.sku))}</div>
+              </div>
+            </div>
+          </div>`;
       } else {
-        window.opener?.postMessage({ sku: null }, '*');
-        window.close();
+        resultado.innerHTML = `
+          <div class="res-error">
+            <div class="error-icon">🔎</div>
+            <div>
+              <div class="error-title">No encontrado</div>
+              <div class="error-msg">${esc(data.error)}</div>
+            </div>
+          </div>`;
       }
+      resultado.classList.remove('hidden');
     }
-
-    // Iniciar al cargar
-    iniciarScanner();
+ 
+    function mostrarErrorConexion(err) {
+      resultado.innerHTML = `
+        <div class="res-error">
+          <div class="error-icon">⚠️</div>
+          <div>
+            <div class="error-title">Error de conexión</div>
+            <div class="error-msg">${esc(err.message || 'No se pudo conectar.')}</div>
+          </div>
+        </div>`;
+    }
+ 
+    function esc(str) {
+      return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
   </script>
 </body>
 </html>
