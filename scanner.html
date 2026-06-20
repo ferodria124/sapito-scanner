@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Escáner SKU – Sapito 3.0</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --verde: #1a3a2a;
+      --verde-medio: #2d6a4f;
+      --verde-claro: #40916c;
+      --verde-neon: #74c69d;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--verde), var(--verde-medio));
+      padding: 14px 20px;
+      padding-top: calc(14px + env(safe-area-inset-top));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    .header-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .header-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 2px;
+    }
+    .btn-cerrar {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Visor cámara */
+    .viewport {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Overlay oscuro con ventana central */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .overlay-top    { position: absolute; top: 0; left: 0; right: 0; height: 20%; background: rgba(0,0,0,0.55); }
+    .overlay-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: rgba(0,0,0,0.55); }
+    .overlay-left   { position: absolute; top: 20%; bottom: 30%; left: 0; width: 8%; background: rgba(0,0,0,0.55); }
+    .overlay-right  { position: absolute; top: 20%; bottom: 30%; right: 0; width: 8%; background: rgba(0,0,0,0.55); }
+
+    /* Ventana de escaneo */
+    .scan-window {
+      position: absolute;
+      top: 20%;
+      bottom: 30%;
+      left: 8%;
+      right: 8%;
+      border-radius: 12px;
+    }
+
+    /* Esquinas */
+    .corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: var(--verde-neon);
+      border-style: solid;
+    }
+    .corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 6px 0 0 0; }
+    .corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 6px 0 0; }
+    .corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 6px; }
+    .corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 6px 0; }
+
+    /* Línea de escaneo */
+    .scan-line {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--verde-neon), transparent);
+      box-shadow: 0 0 10px var(--verde-neon);
+      animation: scanLine 2s ease-in-out infinite;
+    }
+    @keyframes scanLine {
+      0%   { top: 8px;  opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { top: calc(100% - 8px); opacity: 0; }
+    }
+
+    /* Hint texto */
+    .hint {
+      position: absolute;
+      bottom: 32%;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      padding: 0 20px;
+    }
+
+    /* Estado / resultado */
+    .status-bar {
+      background: var(--verde);
+      padding: 16px 20px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      flex-shrink: 0;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .status-icon { font-size: 22px; }
+    .status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
+    .status-text strong { color: #fff; display: block; font-size: 16px; }
+
+    /* Éxito */
+    .success-bar {
+      background: linear-gradient(135deg, #065f46, var(--verde-claro));
+      animation: flashGreen 0.4s ease;
+    }
+    @keyframes flashGreen {
+      0%   { opacity: 0.3; transform: scale(0.98); }
+      100% { opacity: 1;   transform: scale(1); }
+    }
+
+    /* Error */
+    .error-msg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px;
+      text-align: center;
+    }
+    .error-msg h2 { font-size: 18px; color: #fca5a5; }
+    .error-msg p  { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+    .btn-reintentar {
+      background: var(--verde-claro);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <div class="header-title">📷 Escáner SKU</div>
+      <div class="header-sub">Control Sapito 3.0 · Algarrobo</div>
+    </div>
+    <button class="btn-cerrar" onclick="cerrar()">✕ Cerrar</button>
+  </div>
+
+  <div class="viewport">
+    <video id="video" autoplay playsinline muted></video>
+
+    <div class="overlay">
+      <div class="overlay-top"></div>
+      <div class="overlay-bottom"></div>
+      <div class="overlay-left"></div>
+      <div class="overlay-right"></div>
+    </div>
+
+    <div class="scan-window" id="scanWindow">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+      <div class="scan-line"></div>
+    </div>
+
+    <div class="hint">Centra el código de barras dentro del recuadro</div>
+
+    <div id="errorMsg" class="error-msg" style="display:none">
+      <h2>⚠️ Sin acceso a la cámara</h2>
+      <p>Permite el acceso a la cámara en tu navegador e intenta de nuevo.</p>
+      <button class="btn-reintentar" onclick="iniciarScanner()">Reintentar</button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <span class="status-icon">🔍</span>
+    <span class="status-text">Buscando código de barras…</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.18.6/index.min.js"></script>
+  <script>
+    let codeReader = null;
+    let escaneado  = false;
+
+    // Obtener URL de retorno desde parámetro ?back=
+    const params  = new URLSearchParams(window.location.search);
+    const backUrl = params.get('back') || '';
+
+    async function iniciarScanner() {
+      document.getElementById('errorMsg').style.display = 'none';
+      escaneado = false;
+
+      try {
+        codeReader = new ZXing.BrowserMultiFormatReader();
+        const devices = await codeReader.listVideoInputDevices();
+
+        if (!devices.length) throw new Error('No se encontró ninguna cámara.');
+
+        // Preferir cámara trasera
+        const camara = devices.find(d =>
+          /back|rear|trasera|environment/i.test(d.label)
+        ) || devices[devices.length - 1];
+
+        await codeReader.decodeFromVideoDevice(
+          camara.deviceId,
+          'video',
+          (result, err) => {
+            if (result && !escaneado) {
+              escaneado = true;
+              const codigo = result.getText();
+              mostrarExito(codigo);
+
+              // Vibrar si el dispositivo lo soporta
+              if (navigator.vibrate) navigator.vibrate(100);
+
+              // Esperar 1 segundo y volver a la app con el código
+              setTimeout(() => {
+                if (backUrl) {
+                  window.location.href = backUrl + '?sku=' + encodeURIComponent(codigo);
+                } else {
+                  // Si no hay URL de retorno, intentar postMessage al padre
+                  window.opener?.postMessage({ sku: codigo }, '*');
+                  window.close();
+                }
+              }, 1200);
+            }
+          }
+        );
+
+      } catch(err) {
+        document.getElementById('errorMsg').style.display = 'flex';
+        console.error(err);
+      }
+    }
+
+    function mostrarExito(codigo) {
+      const bar = document.getElementById('statusBar');
+      bar.className = 'status-bar success-bar';
+      bar.innerHTML = `
+        <span class="status-icon">✅</span>
+        <span class="status-text">
+          <strong>${codigo}</strong>
+          Redirigiendo a la app…
+        </span>`;
+    }
+
+    function cerrar() {
+      if (codeReader) codeReader.reset();
+      if (backUrl) {
+        window.location.href = backUrl;
+      } else {
+        window.opener?.postMessage({ sku: null }, '*');
+        window.close();
+      }
+    }
+
+    // Iniciar al cargar
+    iniciarScanner();
+  </script>
+</body>
+</html>
