@@ -158,6 +158,22 @@
       .stock-number { font-size: 52px; }
       .res-body { padding: 16px; }
     }
+    .btn-scanner {
+  padding: 14px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 22px;
+  cursor: pointer;
+  min-height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+   .btn-scanner:active { background: #d8f3dc; border-color: #40916c; }
   </style>
 </head>
 <body>
@@ -192,6 +208,7 @@
           />
           <div id="suggestions" class="suggestions hidden"></div>
         </div>
+        <button class="btn-scanner" onclick="abrirScanner()" title="Escanear">📷</button>
         <button id="btnBuscar" class="btn-buscar" onclick="buscar()">Consultar</button>
       </div>
     </section>
@@ -420,6 +437,21 @@
     function escHtml(str) {
       return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
+    function abrirScanner() {
+  const url = 'https://ferodria124.github.io/sapito-scanner/scanner.html?back=' 
+              + encodeURIComponent(window.location.href);
+  window.location.href = url;
+}
+
+// Al volver del escáner con SKU en la URL
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(window.location.search);
+  const sku    = params.get('sku');
+  if (sku) {
+    document.getElementById('skuInput').value = sku;
+    buscar();
+  }
+});
   </script>
 </body>
 </html>
