@@ -411,17 +411,32 @@
 
     // ── JSONP helper ──
     function jsonp(url, callback) {
-      const fnName = 'cb_' + Date.now();
-      window[fnName] = function(data) {
-        delete window[fnName];
-        document.getElementById('jsonpScript')?.remove();
-        callback(data);
-      };
-      const s = document.createElement('script');
-      s.id  = 'jsonpScript';
-      s.src = url + '&callback=' + fnName;
-      s.onerror = () => { delete window[fnName]; callback(null); };
-      document.body.appendChild(s);
+  const fnName = '_cb' + Date.now();
+  // Limpiar script anterior
+  const old = document.getElementById('_jsonp');
+  if (old) old.remove();
+
+  window[fnName] = function(data) {
+    try { delete window[fnName]; } catch(e) {}
+    const el = document.getElementById('_jsonp');
+    if (el) el.remove();
+    callback(data);
+  };
+
+  const s = document.createElement('script');
+  s.id  = '_jsonp';
+  s.src = url + '&callback=' + fnName;
+  s.onerror = function() {
+    try { delete window[fnName]; } catch(e) {}
+    this.remove();
+    // Reintentar con fetch como fallback
+    fetch(url.replace('&callback=' + fnName, ''))
+      .then(r => r.json())
+      .then(d => callback(d))
+      .catch(() => callback(null));
+  };
+  document.head.appendChild(s);
+}
     }
 
     // ── Autocompletar ──
