@@ -11,7 +11,7 @@
   <title>Control Sapito 3.0 – Algarrobo</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
     :root {
       --verde-oscuro:  #1a3a2a;
       --verde-medio:   #2d6a4f;
@@ -27,9 +27,9 @@
       --radio:         16px;
       --font:          'Segoe UI', system-ui, -apple-system, sans-serif;
     }
- 
+
     html { height: 100%; -webkit-text-size-adjust: 100%; }
- 
+
     body {
       font-family: var(--font);
       background: linear-gradient(135deg, #e8f5e9 0%, #f0faf3 50%, #e0f2e9 100%);
@@ -40,7 +40,7 @@
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
     }
- 
+
     /* ── Header ── */
     .header {
       background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
@@ -64,14 +64,14 @@
     .header-title { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.1; }
     .header-title .ver { color: var(--verde-neon); }
     .header-loc { font-size: 12px; color: rgba(255,255,255,0.70); font-weight: 500; }
- 
+
     /* ── Main ── */
     .main {
       flex: 1; max-width: 720px; width: 100%;
       margin: 0 auto; padding: 20px 16px 32px;
       display: flex; flex-direction: column; gap: 16px;
     }
- 
+
     /* ── Search Card ── */
     .search-card {
       background: var(--blanco); border-radius: var(--radio);
@@ -101,7 +101,7 @@
       box-shadow: 0 0 0 4px rgba(64,145,108,0.12);
     }
     .search-input::placeholder { color: #9ca3af; }
- 
+
     /* Suggestions */
     .suggestions {
       position: absolute; top: calc(100% + 6px); left: 0; right: 0;
@@ -119,7 +119,7 @@
     }
     .suggestion-item:last-child { border-bottom: none; }
     .suggestion-item:hover, .suggestion-item.active { background: var(--verde-pale); }
- 
+
     /* Botones */
     .btn-scanner {
       padding: 14px; background: var(--gris-suave);
@@ -131,7 +131,7 @@
       transition: background 0.2s, border-color 0.2s;
     }
     .btn-scanner:active { background: var(--verde-suave); border-color: var(--verde-claro); }
- 
+
     .btn-buscar {
       flex: 1; order: 3;
       padding: 14px 20px;
@@ -145,7 +145,7 @@
     }
     .btn-buscar:active { transform: scale(0.97); opacity: 0.9; }
     .btn-buscar:disabled { opacity: 0.6; }
- 
+
     /* ── Resultado ── */
     .resultado {
       background: var(--blanco); border-radius: var(--radio);
@@ -183,12 +183,12 @@
     .badge-ok   { background: #d1fae5; color: #065f46; }
     .badge-low  { background: #fef3c7; color: #92400e; }
     .badge-zero { background: #fee2e2; color: #991b1b; }
- 
+
     .res-error { padding: 24px 20px; display: flex; align-items: center; gap: 14px; }
     .error-icon { font-size: 28px; }
     .error-title { font-size: 15px; font-weight: 700; color: #991b1b; }
     .error-msg   { font-size: 13px; color: #6b7280; margin-top: 2px; }
- 
+
     .loading { padding: 40px; text-align: center; color: var(--verde-medio); }
     .spinner {
       width: 36px; height: 36px;
@@ -196,17 +196,17 @@
       border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
- 
+
     .empty-state { text-align: center; padding: 48px 20px; color: #9ca3af; }
     .empty-icon { font-size: 56px; margin-bottom: 16px; }
     .empty-text { font-size: 15px; line-height: 1.5; }
- 
+
     .footer {
       text-align: center; padding: 16px; font-size: 11px; color: #9ca3af;
       border-top: 1px solid var(--gris-borde); background: var(--blanco);
       padding-bottom: calc(16px + env(safe-area-inset-bottom));
     }
- 
+
     /* ── Scanner ── */
     .scanner-overlay {
       position: fixed; inset: 0; background: #000;
@@ -276,7 +276,7 @@
       padding: 12px 28px; border-radius: 12px; font-size: 15px;
       font-weight: 700; cursor: pointer; margin-top: 8px;
     }
- 
+
     @media (max-width: 480px) {
       .res-grid { grid-template-columns: 1fr; }
       .res-field.highlight { grid-column: 1; }
@@ -285,7 +285,7 @@
   </style>
 </head>
 <body>
- 
+
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
@@ -303,7 +303,7 @@
       </div>
     </div>
   </header>
- 
+
   <!-- MAIN -->
   <main class="main">
     <section class="search-card">
@@ -322,19 +322,19 @@
         <button class="btn-buscar" onclick="buscar()">Consultar</button>
       </div>
     </section>
- 
+
     <section id="resultado" class="resultado hidden"></section>
- 
+
     <div id="estadoVacio" class="empty-state">
       <div class="empty-icon">📦</div>
       <p class="empty-text">Escribe un SKU o escanea el código de barras del producto.</p>
     </div>
   </main>
- 
+
   <footer class="footer">
     Control Sapito 3.0 · Algarrobo &nbsp;·&nbsp; Powered by Google Sheets
   </footer>
- 
+
   <!-- SCANNER OVERLAY -->
   <div id="scannerOverlay" class="scanner-overlay hidden">
     <div class="scanner-header">
@@ -369,24 +369,24 @@
       <span class="scanner-status-text">Buscando código de barras…</span>
     </div>
   </div>
- 
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.18.6/index.min.js"></script>
   <script>
     // ── CONFIG ── Reemplaza con tu URL de Google Apps Script
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNRIdcO5bMRIOlEAJExUzzGAmcwwYb9RBgq6b2yh2uQDEd11p-UVjTYvTH71bHnCHw6A/exec';
- 
+
     // ── Estado ──
     let sugerenciaActiva = -1;
     let timeoutSugerencias;
     let codeReader = null;
     let scannerActivo = false;
- 
+
     // ── DOM ──
     const input       = document.getElementById('skuInput');
     const suggestions = document.getElementById('suggestions');
     const resultado   = document.getElementById('resultado');
     const estadoVacio = document.getElementById('estadoVacio');
- 
+
     // ── Enter / flechas ──
     input.addEventListener('keydown', function(e) {
       const items = suggestions.querySelectorAll('.suggestion-item');
@@ -408,20 +408,34 @@
         cerrarSugerencias();
       }
     });
- 
+
+    // ── JSONP helper ──
+    function jsonp(url, callback) {
+      const fnName = 'cb_' + Date.now();
+      window[fnName] = function(data) {
+        delete window[fnName];
+        document.getElementById('jsonpScript')?.remove();
+        callback(data);
+      };
+      const s = document.createElement('script');
+      s.id  = 'jsonpScript';
+      s.src = url + '&callback=' + fnName;
+      s.onerror = () => { delete window[fnName]; callback(null); };
+      document.body.appendChild(s);
+    }
+
     // ── Autocompletar ──
     input.addEventListener('input', function() {
       clearTimeout(timeoutSugerencias);
       const val = this.value.trim();
       if (val.length < 2) { cerrarSugerencias(); return; }
       timeoutSugerencias = setTimeout(() => {
-        fetch(APPS_SCRIPT_URL + '?action=sugerir&prefijo=' + encodeURIComponent(val))
-          .then(r => r.json())
-          .then(data => mostrarSugerencias(data))
-          .catch(() => cerrarSugerencias());
+        jsonp(APPS_SCRIPT_URL + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+          data => data ? mostrarSugerencias(data) : cerrarSugerencias()
+        );
       }, 280);
     });
- 
+
     function mostrarSugerencias(lista) {
       if (!lista || lista.length === 0) { cerrarSugerencias(); return; }
       sugerenciaActiva = -1;
@@ -430,36 +444,35 @@
       ).join('');
       suggestions.classList.remove('hidden');
     }
- 
+
     function elegirSugerencia(sku) {
       input.value = sku;
       cerrarSugerencias();
       buscar();
     }
- 
+
     function cerrarSugerencias() {
       suggestions.classList.add('hidden');
       suggestions.innerHTML = '';
       sugerenciaActiva = -1;
     }
- 
+
     document.addEventListener('click', e => {
       if (!e.target.closest('.input-wrap')) cerrarSugerencias();
     });
- 
+
     // ── Buscar ──
     function buscar() {
       const sku = input.value.trim();
       if (!sku) { input.focus(); return; }
       cerrarSugerencias();
       mostrarLoading();
- 
-      fetch(APPS_SCRIPT_URL + '?action=buscar&sku=' + encodeURIComponent(sku))
-        .then(r => r.json())
-        .then(data => mostrarResultado(data))
-        .catch(err => mostrarErrorConexion(err));
+
+      jsonp(APPS_SCRIPT_URL + '?action=buscar&sku=' + encodeURIComponent(sku),
+        data => data ? mostrarResultado(data) : mostrarErrorConexion({message: 'Sin respuesta del servidor.'})
+      );
     }
- 
+
     // ── Scanner ──
     function abrirScanner() {
       document.getElementById('scannerOverlay').classList.remove('hidden');
@@ -468,35 +481,35 @@
       document.getElementById('scannerStatus').innerHTML = '<span>🔍</span><span class="scanner-status-text">Buscando código de barras…</span>';
       iniciarCamara();
     }
- 
+
     function cerrarScanner() {
       scannerActivo = false;
       if (codeReader) { codeReader.reset(); codeReader = null; }
       document.getElementById('scannerOverlay').classList.add('hidden');
     }
- 
+
     async function iniciarCamara() {
       document.getElementById('scannerError').classList.add('hidden');
       scannerActivo = true;
- 
+
       try {
         codeReader = new ZXing.BrowserMultiFormatReader();
         const devices = await codeReader.listVideoInputDevices();
         if (!devices.length) throw new Error('No hay cámara disponible.');
- 
+
         const camara = devices.find(d => /back|rear|trasera|environment/i.test(d.label))
                     || devices[devices.length - 1];
- 
+
         await codeReader.decodeFromVideoDevice(camara.deviceId, 'scannerVideo', (result, err) => {
           if (result && scannerActivo) {
             scannerActivo = false;
             const codigo = result.getText();
             if (navigator.vibrate) navigator.vibrate(100);
- 
+
             const st = document.getElementById('scannerStatus');
             st.className = 'scanner-status success';
             st.innerHTML = `<span>✅</span><span class="scanner-status-text"><strong>${codigo}</strong>Consultando bodega…</span>`;
- 
+
             setTimeout(() => {
               cerrarScanner();
               input.value = codigo;
@@ -508,14 +521,14 @@
         document.getElementById('scannerError').classList.remove('hidden');
       }
     }
- 
+
     // ── Resultados ──
     function mostrarLoading() {
       estadoVacio.style.display = 'none';
       resultado.classList.remove('hidden');
       resultado.innerHTML = `<div class="loading"><div class="spinner"></div><p>Consultando bodega…</p></div>`;
     }
- 
+
     function mostrarResultado(data) {
       if (data.success) {
         const stock = data.stock;
@@ -524,7 +537,7 @@
           : stock <= 5
           ? `<span class="stock-badge badge-low">Stock bajo</span>`
           : `<span class="stock-badge badge-ok">Disponible</span>`;
- 
+
         resultado.innerHTML = `
           <div class="res-header">
             <span class="res-header-icon">📦</span>
@@ -563,7 +576,7 @@
       }
       resultado.classList.remove('hidden');
     }
- 
+
     function mostrarErrorConexion(err) {
       resultado.innerHTML = `
         <div class="res-error">
@@ -574,7 +587,7 @@
           </div>
         </div>`;
     }
- 
+
     function esc(str) {
       return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
