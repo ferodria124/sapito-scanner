@@ -2,262 +2,554 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Sapito 3.0">
-  <meta name="theme-color" content="#1a3a2a">
+  <meta name="theme-color" content="#0a0f1e">
   <title>Control Sapito 3.0 – Algarrobo</title>
   <style>
-    html, body { width: 100% !important; max-width: 100% !important; overflow-x: hidden !important; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --verde-oscuro:  #EBF8FF;
-      --verde-medio:   #A1D6F7;
-      --verde-claro:   #0F6AA3;
-      --verde-suave:   #064975;
-      --verde-pale:    #FF8282;
-      --blanco:        #ffffff;
-      --gris-texto:    #374151;
-      --gris-suave:    #BAE4FF;
-      --gris-borde:    #e5e7eb;
-      --sombra:        0 4px 24px rgba(26,58,42,0.10);
-      --sombra-hover:  0 8px 32px rgba(26,58,42,0.18);
-      --radio:         16px;
-      --font:          'Segoe UI', system-ui, -apple-system, sans-serif;
+      /* Paleta limpia azul/blanco/gris */
+      --azul-900: #1e293b;
+      --azul-800: #1e40af;
+      --azul-700: #1d4ed8;
+      --azul-600: #2563eb;
+      --azul-500: #2563eb;
+      --azul-400: #3b82f6;
+      --azul-300: #93c5fd;
+      --azul-100: #dbeafe;
+      --azul-50:  #eff6ff;
+
+      /* Acento */
+      --cian:       #2563eb;
+      --cian-suave: #dbeafe;
+
+      /* Neutros */
+      --blanco:   #ffffff;
+      --gris-900: #111827;
+      --gris-700: #374151;
+      --gris-500: #6b7280;
+      --gris-200: #e5e7eb;
+      --gris-100: #f3f4f6;
+      --gris-50:  #f9fafb;
+
+      /* Fondo general */
+      --fondo:    #f0f2f5;
+
+      /* Semáforo stock — se mantienen */
+      --verde:      #16a34a;
+      --verde-bg:   #dcfce7;
+      --amarillo:   #d97706;
+      --amarillo-bg:#fef3c7;
+      --rojo:       #dc2626;
+      --rojo-bg:    #fee2e2;
+
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --radio: 14px;
+      --sombra: 0 4px 24px rgba(0,0,0,0.18);
+      --sombra-lg: 0 8px 40px rgba(0,0,0,0.28);
     }
 
     html { height: 100%; -webkit-text-size-adjust: 100%; }
 
     body {
       font-family: var(--font);
-      background: linear-gradient(#FAF7F7);
+      background: var(--fondo);
       min-height: 100vh;
-      min-height: -webkit-fill-available;
-      color: var(--gris-texto);
+      color: var(--gris-900);
       display: flex; flex-direction: column;
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
     }
 
+    /* ── HEADER ── */
     .header {
-      background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
-      box-shadow: 0 4px 20px rgba(26,58,42,0.25);
-      position: sticky; top: 0; z-index: 10;
+      background: var(--blanco);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+      position: sticky; top: 0; z-index: 50;
+      border-bottom: 1px solid var(--gris-200);
     }
     .header-inner {
-      max-width: 720px; margin: 0 auto;
-      padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+      max-width: 680px; margin: 0 auto;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 14px;
     }
     .logo-wrap {
-      flex-shrink: 0; background: rgba(255,255,255,0.12);
-      border-radius: 10px; padding: 8px 12px;
-      border: 1px solid rgba(255,255,255,0.20);
+      flex-shrink: 0;
+      background: var(--gris-50);
+      border: 1px solid var(--gris-200);
+      border-radius: 10px; padding: 7px 11px;
     }
-    .logo { height: 40px; width: auto; display: block; object-fit: contain; }
-    .header-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    .header-tag { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.55); }
-    .header-title { font-size: 22px; font-weight: 800; color: var(--blanco); line-height: 1.1; letter-spacing: -0.5px; white-space: nowrap; }
-    .header-title .ver { color: #74c69d; }
-    .header-loc { font-size: 12px; color: rgba(255,255,255,0.70); font-weight: 500; }
+    .logo { height: 36px; width: auto; object-fit: contain; display: block; }
+    .header-text { flex: 1; min-width: 0; }
+    .header-eyebrow {
+      font-size: 9px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--azul-500);
+      margin-bottom: 2px;
+    }
+    .header-title {
+      font-size: 20px; font-weight: 900; color: var(--gris-900);
+      letter-spacing: -0.5px; line-height: 1;
+    }
+    .header-title .ver {
+      color: var(--cian);
+      font-size: 22px;
+    }
+    .header-loc {
+      font-size: 11px; color: var(--gris-500);
+      margin-top: 3px; font-weight: 500;
+    }
+    .header-badge {
+      flex-shrink: 0;
+      background: var(--azul-50);
+      border: 1px solid var(--azul-100);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 11px; font-weight: 700;
+      color: var(--azul-500); letter-spacing: 0.5px;
+    }
 
-    .main { flex: 1; max-width: 720px; width: 100%; margin: 0 auto; padding: 20px 16px 32px; display: flex; flex-direction: column; gap: 16px; }
+    /* ── MAIN ── */
+    .main {
+      flex: 1; max-width: 680px; width: 100%;
+      margin: 0 auto; padding: 20px 16px 40px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
 
-    .search-card { background: var(--blanco); border-radius: var(--radio); padding: 20px; box-shadow: var(--sombra); border: 1px solid var(--gris-borde); }
-    .search-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--verde-medio); margin-bottom: 12px; }
-    .search-row { display: flex; gap: 10px; align-items: stretch; }
-    .input-wrap { flex: 1; position: relative; }
-    .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+    /* ── SEARCH CARD ── */
+    .search-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 20px;
+      box-shadow: var(--sombra);
+      border: 1px solid var(--gris-200);
+    }
+    .search-eyebrow {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--azul-500); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .search-eyebrow::before {
+      content: ''; display: block; width: 3px; height: 14px;
+      background: var(--azul-500); border-radius: 2px;
+    }
+    .search-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
+    .input-wrap { flex: 1 1 200px; position: relative; order: 1; }
+    .input-icon {
+      position: absolute; left: 13px; top: 50%;
+      transform: translateY(-50%); font-size: 15px; pointer-events: none;
+    }
     .search-input {
-      width: 100%; padding: 14px 14px 14px 42px;
-      border: 2px solid var(--gris-borde); border-radius: 12px;
-      font-size: 16px; font-family: var(--font); color: var(--gris-texto);
-      background: var(--blanco); transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none; -webkit-appearance: none; appearance: none;
+      width: 100%; padding: 13px 13px 13px 40px;
+      border: 2px solid var(--gris-200); border-radius: 11px;
+      font-size: 16px; font-family: var(--font); color: var(--gris-900);
+      background: var(--gris-50); outline: none;
+      -webkit-appearance: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .search-input:focus { border-color: var(--verde-claro); background: var(--blanco); box-shadow: 0 0 0 4px rgba(64,145,108,0.12); }
+    .search-input:focus {
+      border-color: var(--azul-400); background: var(--blanco);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+    }
     .search-input::placeholder { color: #9ca3af; }
 
+    /* Suggestions */
     .suggestions {
       position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-      background: var(--blanco); border: 1.5px solid var(--verde-claro);
-      border-radius: 10px; box-shadow: var(--sombra-hover); z-index: 100; overflow: hidden;
+      background: var(--blanco); border: 1.5px solid var(--azul-400);
+      border-radius: 11px; box-shadow: var(--sombra-lg);
+      z-index: 100; overflow: hidden;
     }
     .suggestions.hidden { display: none; }
     .suggestion-item {
-      padding: 14px 16px; cursor: pointer; font-size: 15px; font-weight: 500;
-      color: #1F1E1E; border-bottom: 1px solid var(--gris-borde);
-      transition: background 0.15s; min-height: 44px; display: flex;
-      align-items: center; flex-direction: column; justify-content: center;
+      padding: 11px 14px; cursor: pointer;
+      border-bottom: 1px solid var(--gris-200);
+      transition: background 0.12s;
+      min-height: 44px; display: flex; flex-direction: column; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
     }
     .suggestion-item:last-child { border-bottom: none; }
-    .suggestion-item:hover, .suggestion-item.active { background: #E8FFFF; }
-
-    .btn-buscar {
-      padding: 14px 20px;
-      background: linear-gradient(135deg, var(--verde-medio), var(--verde-claro));
-      color: var(--blanco); border: none; border-radius: 12px;
-      font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap;
-      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
-      box-shadow: 0 4px 12px rgba(45,106,79,0.30);
-      min-height: 48px; min-width: 96px;
-      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    .suggestion-item:hover, .suggestion-item.active { background: var(--fondo); }
+    .sugg-label { font-size: 10px; color: var(--gris-500); font-family: monospace; }
+    .sugg-desc  { font-size: 13px; font-weight: 600; color: var(--gris-900); margin-top: 1px; }
+    .sugg-badge {
+      display: inline-block; font-size: 9px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px; margin-left: 6px;
+      background: var(--azul-100); color: var(--azul-500);
+      vertical-align: middle; letter-spacing: 0.5px;
     }
-    .btn-buscar:active { transform: scale(0.97); opacity: 0.9; }
-    .btn-buscar:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .resultado { background: var(--blanco); border-radius: var(--radio); overflow: hidden; box-shadow: var(--sombra); border: 1px solid var(--gris-borde); animation: slideIn 0.3s ease; }
+    /* Botones */
+    .btn-cam {
+      order: 2; flex-shrink: 0;
+      width: 48px; height: 48px;
+      background: var(--gris-100); border: 2px solid var(--gris-200);
+      border-radius: 11px; font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+    }
+    .btn-cam:active { background: var(--azul-100); border-color: var(--azul-400); transform: scale(0.95); }
+
+    .btn-consultar {
+      order: 3; flex: 1 1 80px;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, var(--azul-600), var(--azul-500));
+      color: var(--blanco); border: none; border-radius: 11px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(29,78,216,0.35);
+      -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+      min-height: 48px; white-space: nowrap;
+    }
+    .btn-consultar:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-consultar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── RESULTADO ── */
+    .resultado {
+      background: var(--blanco); border-radius: var(--radio);
+      overflow: hidden; box-shadow: var(--sombra);
+      border: 1px solid var(--gris-200);
+      animation: slideIn 0.25s ease;
+    }
     .resultado.hidden { display: none; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .res-header { background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-medio)); padding: 18px 20px; display: flex; align-items: center; gap: 12px; }
-    .res-header-icon { font-size: 20px; }
-    .res-header-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.60); }
-    .res-header-sku { font-size: 18px; font-weight: 800; color: var(--blanco); }
-    .res-body { padding: 20px; }
-    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .res-field { background: var(--gris-suave); border: 1.5px solid var(--gris-borde); border-radius: 12px; padding: 16px; }
-    .res-field.highlight { background: var(--verde-suave); border-color: #95d5b2; grid-column: 1 / -1; }
-    .res-field-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
-    .res-field.highlight .res-field-label { color: var(--blanco); }
-    .res-field-value { font-size: 14px; font-weight: 600; color: var(--blanco); line-height: 1.4; }
-    .stock-number { font-size: 48px; font-weight: 900; color: var(--verde-claro); line-height: 1; letter-spacing: -1px; }
-    .stock-unit { font-size: 13px; font-weight: 600; color: var(--verde-claro); margin-top: 4px; }
-    .stock-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; }
-    .badge-ok   { background: #d1fae5; color: #065f46; }
-    .badge-low  { background: #fef3c7; color: #92400e; }
-    .badge-zero { background: #fee2e2; color: #991b1b; }
-
-    .res-error { padding: 24px 20px; display: flex; align-items: center; gap: 14px; }
-    .error-icon { font-size: 28px; }
-    .error-title { font-size: 15px; font-weight: 700; color: #991b1b; }
-    .error-msg { font-size: 13px; color: #6b7280; margin-top: 2px; }
-
-    .loading { padding: 40px; text-align: center; color: var(--verde-medio); }
-    .spinner { width: 36px; height: 36px; border: 3px solid var(--gris-suave); border-top-color: var(--verde-claro); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .empty-state { text-align: center; padding: 48px 20px; color: #9ca3af; }
-    .empty-icon { font-size: 56px; margin-bottom: 16px; }
-    .empty-text { font-size: 15px; line-height: 1.5; }
-
-    .footer { text-align: center; padding: 16px; font-size: 11px; color: #9ca3af; border-top: 1px solid var(--gris-borde); background: var(--blanco); padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
-
-    @media (max-width: 480px) {
-      .header-inner { padding: 14px 16px; gap: 12px; }
-      .header-title { font-size: 19px; }
-      .logo { height: 34px; }
-      .main { padding: 16px 12px 24px; gap: 12px; }
-      .search-card { padding: 16px; }
-      .search-row { flex-direction: column; gap: 10px; }
-      .btn-buscar { width: 100%; font-size: 16px; padding: 16px; }
-      .res-grid { grid-template-columns: 1fr; }
-      .res-field.highlight { grid-column: 1; }
-      .stock-number { font-size: 52px; }
-      .res-body { padding: 16px; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    .btn-scanner {
-  padding: 14px;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 22px;
-  cursor: pointer;
-  min-height: 48px;
-  min-width: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-  flex-shrink: 0;
-}
-   .btn-scanner:active { background: #d8f3dc; border-color: #40916c; }
+
+    .res-header {
+      background: linear-gradient(135deg, var(--azul-900), var(--azul-600));
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid rgba(59,130,246,0.2);
+    }
+    .res-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .res-found-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--azul-300);
+    }
+    .res-sku {
+      font-size: 17px; font-weight: 900; color: var(--blanco);
+      font-family: monospace; letter-spacing: 0.5px;
+    }
+
+    .res-body { padding: 18px; }
+    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .res-field {
+      background: var(--gris-50); border: 1.5px solid var(--gris-200);
+      border-radius: 11px; padding: 14px;
+    }
+    .res-field.span2 { grid-column: 1 / -1; }
+    .res-field.desc-field {
+      background: var(--fondo); border-color: var(--azul-100);
+    }
+    .res-field-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--gris-500); margin-bottom: 6px;
+    }
+    .res-field.desc-field .res-field-label { color: var(--azul-500); }
+    .res-field-value {
+      font-size: 14px; font-weight: 600; color: var(--gris-900); line-height: 1.4;
+    }
+
+    /* Stock display */
+    .stock-num {
+      font-size: 52px; font-weight: 900; line-height: 1;
+      letter-spacing: -2px; color: var(--gris-900);
+    }
+    .stock-unit {
+      font-size: 12px; font-weight: 600; color: var(--gris-500);
+      margin-top: 3px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .stock-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; margin-top: 10px;
+    }
+    .stock-badge::before { content: '●'; font-size: 8px; }
+    .badge-ok   { background: var(--verde-bg);    color: var(--verde); }
+    .badge-low  { background: var(--amarillo-bg); color: var(--amarillo); }
+    .badge-zero { background: var(--rojo-bg);     color: var(--rojo); }
+
+    /* Error / Loading */
+    .res-error { padding: 22px; display: flex; align-items: center; gap: 14px; }
+    .error-icon { font-size: 28px; flex-shrink: 0; }
+    .error-title { font-size: 15px; font-weight: 700; color: var(--rojo); }
+    .error-msg   { font-size: 13px; color: var(--gris-500); margin-top: 3px; }
+
+    .loading { padding: 40px; text-align: center; color: var(--azul-400); }
+    .spinner {
+      width: 32px; height: 32px; margin: 0 auto 12px;
+      border: 3px solid var(--azul-100); border-top-color: var(--azul-500);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { font-size: 14px; color: var(--gris-500); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 52px 20px; color: var(--gris-500);
+    }
+    .empty-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.6; }
+    .empty-text { font-size: 15px; line-height: 1.5; max-width: 260px; margin: 0 auto; }
+
+    /* Footer */
+    .footer {
+      text-align: center; padding: 16px;
+      font-size: 11px; color: var(--gris-500);
+      border-top: 1px solid var(--gris-200);
+      background: var(--blanco);
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+
+    /* ══════════════════════════════════════
+       SCANNER POPUP
+    ══════════════════════════════════════ */
+    .scanner-overlay {
+      position: fixed; inset: 0;
+      background: #000;
+      z-index: 999; display: flex; flex-direction: column;
+    }
+    .scanner-overlay.hidden { display: none; }
+
+    .scanner-header {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      padding: 14px 20px;
+      padding-top: calc(14px + env(safe-area-inset-top));
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; border-bottom: 1px solid rgba(59,130,246,0.2);
+    }
+    .scanner-title { font-size: 15px; font-weight: 800; color: var(--blanco); }
+    .scanner-sub   { font-size: 11px; color: var(--gris-500); margin-top: 2px; }
+    .btn-cerrar-scan {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: var(--blanco); font-size: 13px; font-weight: 700;
+      padding: 7px 16px; border-radius: 20px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .scanner-viewport {
+      position: relative; flex: 1; overflow: hidden; background: #000;
+    }
+    #reader { width: 100% !important; height: 100% !important; border: none !important; }
+    #reader__dashboard_section_swaplink,
+    #reader__dashboard_section_fileselection,
+    #reader__filescan_input,
+    #reader__scan_region img { display: none !important; }
+    #reader__scan_region { border: none !important; background: transparent !important; }
+
+    .scan-ui { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+    .s-dark-top    { position: absolute; top: 0; left: 0; right: 0; height: 22%; background: rgba(0,0,0,0.6); }
+    .s-dark-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 28%; background: rgba(0,0,0,0.6); }
+    .s-dark-left   { position: absolute; top: 22%; bottom: 28%; left: 0; width: 7%; background: rgba(0,0,0,0.6); }
+    .s-dark-right  { position: absolute; top: 22%; bottom: 28%; right: 0; width: 7%; background: rgba(0,0,0,0.6); }
+    .s-window      { position: absolute; top: 22%; bottom: 28%; left: 7%; right: 7%; }
+
+    .s-corner { position: absolute; width: 24px; height: 24px; border-color: var(--cian); border-style: solid; }
+    .s-corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 5px 0 0 0; }
+    .s-corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 5px 0 0; }
+    .s-corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 5px; }
+    .s-corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 5px 0; }
+
+    .s-line {
+      position: absolute; left: 4px; right: 4px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cian), transparent);
+      box-shadow: 0 0 12px var(--cian);
+      animation: scanMove 2s ease-in-out infinite;
+    }
+    @keyframes scanMove {
+      0%   { top: 6px; opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { top: calc(100% - 6px); opacity: 0; }
+    }
+    .s-hint {
+      position: absolute; bottom: 29%; left: 0; right: 0;
+      text-align: center; font-size: 13px;
+      color: rgba(255,255,255,0.7); padding: 0 20px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+    }
+
+    .scanner-status {
+      background: #0f172a; padding: 13px 20px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      flex-shrink: 0; min-height: 58px;
+      border-top: 1px solid rgba(59,130,246,0.15);
+    }
+    .scanner-status.success {
+      background: linear-gradient(135deg, #064e3b, var(--verde));
+    }
+    .scan-status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
+    .scan-status-text strong { color: var(--blanco); display: block; font-size: 15px; }
+
+    .scanner-manual {
+      background: #0d1117; padding: 10px 14px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      display: flex; gap: 8px; flex-shrink: 0;
+      border-top: 1px solid #1e2d3d;
+    }
+    .scan-manual-input {
+      flex: 1; padding: 11px 14px;
+      background: #161b22; border: 1.5px solid #30363d;
+      border-radius: 9px; color: var(--blanco); font-size: 16px;
+      font-family: monospace; outline: none; -webkit-appearance: none;
+    }
+    .scan-manual-input:focus { border-color: var(--cian); box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    .scan-manual-input::placeholder { color: #484f58; }
+    .btn-scan-ok {
+      padding: 11px 16px; background: var(--azul-500);
+      color: var(--blanco); border: none; border-radius: 9px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      white-space: nowrap; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-scan-ok:active { opacity: 0.85; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .header-title { font-size: 18px; }
+      .header-title .ver { font-size: 20px; }
+      .main { padding: 14px 12px 32px; gap: 12px; }
+      .search-card { padding: 16px; }
+      .search-row { flex-wrap: wrap; }
+      .input-wrap { flex: 1 1 100%; order: 1; }
+      .btn-cam { order: 2; }
+      .btn-consultar { order: 3; flex: 1; }
+      .res-grid { grid-template-columns: 1fr; }
+      .res-field.span2 { grid-column: 1; }
+      .stock-num { font-size: 44px; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div class="logo-wrap">
         <img
           src="https://www.casaideas.com.bo/static/media/logo.40b7cd09.png"
-          alt="Logo empresa" class="logo"
+          alt="Casaideas" class="logo"
           onerror="this.style.display='none'"
         />
       </div>
       <div class="header-text">
-        <span class="header-tag">SISTEMA DE INVENTARIO</span>
-        <h1 class="header-title">Control Sapito <span class="ver">3.0</span></h1>
-        <span class="header-loc">📍 Algarrobo</span>
+        <div class="header-eyebrow">Sistema de Inventario</div>
+        <div class="header-title">Control Sapito <span class="ver">3.0</span></div>
+        <div class="header-loc">📍 Algarrobo</div>
       </div>
+      <div class="header-badge">BODEGA</div>
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="main">
-    <section class="search-card">
-      <p class="search-label">Ingresa SKU, código madre o descripción</p>
+
+    <div class="search-card">
+      <div class="search-eyebrow">Consultar stock</div>
       <div class="search-row">
         <div class="input-wrap">
           <span class="input-icon">🔍</span>
           <input
             type="text" id="skuInput"
-            placeholder="Ej: 32200000000, 220000, Descripción"
+            placeholder="SKU, código madre o descripción…"
             autocomplete="off" class="search-input"
           />
           <div id="suggestions" class="suggestions hidden"></div>
         </div>
-        <button class="btn-scanner" onclick="abrirScanner()" title="Escanear">📷</button>
-        <button id="btnBuscar" class="btn-buscar" onclick="buscar()">Consultar</button>
+        <button class="btn-cam" onclick="abrirScanner()" title="Escanear código">📷</button>
+        <button class="btn-consultar" onclick="buscar()">Consultar</button>
       </div>
-    </section>
+    </div>
 
     <section id="resultado" class="resultado hidden"></section>
 
     <div id="estadoVacio" class="empty-state">
       <div class="empty-icon">📦</div>
-      <p class="empty-text">Escribe un SKU para consultar el stock disponible en bodega.</p>
+      <p class="empty-text">Ingresa un SKU, código madre o descripción para consultar el stock en bodega.</p>
     </div>
+
   </main>
 
-  <footer class="footer">Control Sapito 3.0 · CasaIdeas Algarrobo</footer>
+  <footer class="footer">
+    Control Sapito 3.0 &nbsp;·&nbsp; CasaIdeas Algarrobo
+  </footer>
 
+  <!-- SCANNER POPUP -->
+  <div id="scannerOverlay" class="scanner-overlay hidden">
+    <div class="scanner-header">
+      <div>
+        <div class="scanner-title">📷 Escáner de código de barras</div>
+        <div class="scanner-sub">Control Sapito 3.0 · Algarrobo</div>
+      </div>
+      <button class="btn-cerrar-scan" onclick="cerrarScanner()">✕ Cerrar</button>
+    </div>
+    <div class="scanner-viewport">
+      <div id="reader"></div>
+      <div class="scan-ui">
+        <div class="s-dark-top"></div>
+        <div class="s-dark-bottom"></div>
+        <div class="s-dark-left"></div>
+        <div class="s-dark-right"></div>
+        <div class="s-window">
+          <span class="s-corner tl"></span>
+          <span class="s-corner tr"></span>
+          <span class="s-corner bl"></span>
+          <span class="s-corner br"></span>
+          <div class="s-line"></div>
+        </div>
+        <div class="s-hint">Centra el código de barras dentro del recuadro</div>
+      </div>
+    </div>
+    <div class="scanner-status" id="scannerStatus">
+      <span>🔍</span>
+      <span class="scan-status-text" id="scannerStatusText">Buscando código de barras…</span>
+    </div>
+    <div class="scanner-manual">
+      <input type="number" inputmode="numeric" class="scan-manual-input"
+        id="scannerManualInput" placeholder="O escribe el SKU manualmente…"/>
+      <button class="btn-scan-ok" onclick="confirmarManualScanner()">✓ OK</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     // ── CONFIG ──
-    const API = 'https://script.google.com/macros/s/AKfycbzKBa24qpv5CSVtu2hF_34HFg9AiQ_zGi8rf5Ph3nUW-58dS2fW_tCNdiZbrPRaAqdXAQ/exec';
+    const API = 'https://script.google.com/macros/s/AKfycbzZzoElwZstS8NMBgB-c4cN4kXbkMZb5MUE0rzZ1CLrL7j3YW15u1Lh_wSeBuko8v4drQ/exec';
 
+    // ── Estado ──
     let sugerenciaActiva = -1;
     let timeoutSugerencias;
+    let scanner   = null;
+    let escaneado = false;
 
     const input       = document.getElementById('skuInput');
     const suggestions = document.getElementById('suggestions');
     const resultado   = document.getElementById('resultado');
     const estadoVacio = document.getElementById('estadoVacio');
 
-    // ── JSONP helper ──
+    // ── JSONP ──
     function jsonp(url, callback) {
       const fn  = '_cb' + Date.now();
-      const old = document.getElementById('_jsonp');
-      if (old) old.remove();
-      window[fn] = function(data) {
+      document.getElementById('_jsonp')?.remove();
+      window[fn] = data => {
         try { delete window[fn]; } catch(e) {}
         document.getElementById('_jsonp')?.remove();
         callback(data);
       };
       const s = document.createElement('script');
-      s.id  = '_jsonp';
-      s.src = url + '&callback=' + fn;
-      s.onerror = function() {
-        try { delete window[fn]; } catch(e) {}
-        this.remove();
-        callback(null);
-      };
+      s.id = '_jsonp'; s.src = url + '&callback=' + fn;
+      s.onerror = () => { try { delete window[fn]; } catch(e) {} this?.remove(); callback(null); };
       document.head.appendChild(s);
     }
 
     // ── Teclado ──
-    input.addEventListener('keydown', function(e) {
+    input.addEventListener('keydown', e => {
       const items = suggestions.querySelectorAll('.suggestion-item');
       if (e.key === 'ArrowDown') {
         e.preventDefault();
@@ -268,10 +560,8 @@
         sugerenciaActiva = Math.max(sugerenciaActiva - 1, -1);
         items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
       } else if (e.key === 'Enter') {
-        if (sugerenciaActiva >= 0 && items[sugerenciaActiva]) {
-          input.value = items[sugerenciaActiva].dataset.sku;
-          cerrarSugerencias();
-        }
+        const active = items[sugerenciaActiva];
+        if (active) { input.value = active.dataset.sku; cerrarSugerencias(); }
         buscar();
       } else if (e.key === 'Escape') {
         cerrarSugerencias();
@@ -285,67 +575,55 @@
       if (val.length < 2) { cerrarSugerencias(); return; }
 
       timeoutSugerencias = setTimeout(() => {
-        const esNumerico = /^\d+$/.test(val);
-
-        if (esNumerico && val.length >= 5) {
-          // Buscar como código madre primero
+        const esNum = /^\d+$/.test(val);
+        if (esNum && val.length >= 5) {
           jsonp(API + '?action=codigoMadre&codigo=' + encodeURIComponent(val), lista => {
-            if (lista && lista.length > 0) {
-              mostrarSugerenciasDesc(lista, true);
-            } else {
-              // Si no hay, buscar como SKU
-              jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val), skus => {
-                if (skus) mostrarSugerencias(skus.map(s => ({ sku: s, desc: '' })));
-                else cerrarSugerencias();
-              });
-            }
+            if (lista && lista.length > 0) mostrarSugerenciasDesc(lista, true);
+            else jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+              skus => skus ? mostrarSugerencias(skus.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+            );
           });
-        } else if (esNumerico) {
-          jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val), lista => {
-            if (lista) mostrarSugerencias(lista.map(s => ({ sku: s, desc: '' })));
-            else cerrarSugerencias();
-          });
+        } else if (esNum) {
+          jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+            lista => lista ? mostrarSugerencias(lista.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+          );
         } else {
-          jsonp(API + '?action=descripcion&texto=' + encodeURIComponent(val), lista => {
-            if (lista) mostrarSugerenciasDesc(lista, false);
-            else cerrarSugerencias();
-          });
+          jsonp(API + '?action=descripcion&texto=' + encodeURIComponent(val),
+            lista => lista ? mostrarSugerenciasDesc(lista, false) : cerrarSugerencias()
+          );
         }
       }, 300);
     });
 
     function mostrarSugerencias(lista) {
-      if (!lista || lista.length === 0) { cerrarSugerencias(); return; }
+      if (!lista || !lista.length) { cerrarSugerencias(); return; }
       sugerenciaActiva = -1;
       suggestions.innerHTML = lista.map(s =>
         `<div class="suggestion-item" data-sku="${s.sku}" onclick="elegirSugerencia('${s.sku}')">
-          <span style="font-weight:700">${escHtml(s.sku)}</span>
+          <span class="sugg-desc">${esc(s.sku)}</span>
         </div>`
       ).join('');
       suggestions.classList.remove('hidden');
     }
 
     function mostrarSugerenciasDesc(lista, esMadre) {
-      if (!lista || lista.length === 0) { cerrarSugerencias(); return; }
+      if (!lista || !lista.length) { cerrarSugerencias(); return; }
       sugerenciaActiva = -1;
       const header = esMadre
-        ? `<div style="padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6b7280;background:#f9fafb;border-bottom:1px solid #e5e7eb">
-            📦 ${lista.length} variante${lista.length > 1 ? 's' : ''} encontrada${lista.length > 1 ? 's' : ''}
-           </div>`
-        : '';
+        ? `<div style="padding:7px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6b7280;background:#f9fafb;border-bottom:1px solid #e5e7eb">
+            📦 ${lista.length} variante${lista.length>1?'s':''} encontrada${lista.length>1?'s':''}
+           </div>` : '';
       suggestions.innerHTML = header + lista.map(s =>
         `<div class="suggestion-item" data-sku="${s.sku}" onclick="elegirSugerencia('${s.sku}')">
-          <span style="font-size:11px;color:#6b7280;display:block;font-family:monospace">${escHtml(s.sku)}</span>
-          <span style="font-weight:600;font-size:13px">${escHtml(s.desc)}</span>
+          <span class="sugg-label">${esc(s.sku)}</span>
+          <span class="sugg-desc">${esc(s.desc)}</span>
         </div>`
       ).join('');
       suggestions.classList.remove('hidden');
     }
 
     function elegirSugerencia(sku) {
-      input.value = sku;
-      cerrarSugerencias();
-      buscar();
+      input.value = sku; cerrarSugerencias(); buscar();
     }
 
     function cerrarSugerencias() {
@@ -365,8 +643,7 @@
       cerrarSugerencias();
       mostrarLoading();
       jsonp(API + '?action=buscar&sku=' + encodeURIComponent(sku), data => {
-        if (data) mostrarResultado(data);
-        else mostrarErrorConexion({ message: 'Sin respuesta del servidor.' });
+        data ? mostrarResultado(data) : mostrarErrorConexion({message:'Sin respuesta del servidor.'});
       });
     }
 
@@ -384,29 +661,30 @@
           : stock <= 5
           ? `<span class="stock-badge badge-low">Stock bajo</span>`
           : `<span class="stock-badge badge-ok">Disponible</span>`;
+
         resultado.innerHTML = `
           <div class="res-header">
-            <span class="res-header-icon">📦</span>
+            <div class="res-icon">📦</div>
             <div>
-              <div class="res-header-label">Producto encontrado</div>
-              <div class="res-header-sku">${escHtml(data.sku)}</div>
+              <div class="res-found-label">Producto encontrado</div>
+              <div class="res-sku">${esc(data.sku)}</div>
             </div>
           </div>
           <div class="res-body">
             <div class="res-grid">
-              <div class="res-field highlight">
-                <div class="res-field-label">Descripción</div>
-                <div class="res-field-value">${escHtml(data.desc) || '<em style="color:#9ca3af">Sin descripción</em>'}</div>
+              <div class="res-field desc-field span2">
+                <div class="res-field-label">Descripción SKU</div>
+                <div class="res-field-value">${esc(data.desc) || '<em style="color:#9ca3af">Sin descripción</em>'}</div>
               </div>
               <div class="res-field">
                 <div class="res-field-label">Stock en Bodega</div>
-                <div class="stock-number">${stock.toLocaleString('es-CL')}</div>
+                <div class="stock-num">${stock.toLocaleString('es-CL')}</div>
                 <div class="stock-unit">unidades</div>
                 ${badge}
               </div>
               <div class="res-field">
                 <div class="res-field-label">SKU Consultado</div>
-                <div class="res-field-value" style="font-family:monospace;font-size:17px">${escHtml(String(data.sku))}</div>
+                <div class="res-field-value" style="font-family:monospace;font-size:15px;word-break:break-all">${esc(String(data.sku))}</div>
               </div>
             </div>
           </div>`;
@@ -415,8 +693,8 @@
           <div class="res-error">
             <div class="error-icon">🔎</div>
             <div>
-              <div class="error-title">No se encontraron resultados</div>
-              <div class="error-msg">${escHtml(data.error)}</div>
+              <div class="error-title">No encontrado</div>
+              <div class="error-msg">${esc(data.error)}</div>
             </div>
           </div>`;
       }
@@ -429,29 +707,107 @@
           <div class="error-icon">⚠️</div>
           <div>
             <div class="error-title">Error de conexión</div>
-            <div class="error-msg">${escHtml(err.message || 'No se pudo conectar con la planilla.')}</div>
+            <div class="error-msg">${esc(err.message || 'No se pudo conectar.')}</div>
           </div>
         </div>`;
     }
 
-    function escHtml(str) {
-      return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-    function abrirScanner() {
-  const url = 'https://ferodria124.github.io/sapito-scanner/scanner.html?back=' 
-              + encodeURIComponent(window.location.href);
-  window.location.href = url;
-}
+    // ── SCANNER ──
+    async function abrirScanner() {
+      document.getElementById('scannerOverlay').classList.remove('hidden');
+      document.getElementById('scannerStatus').className = 'scanner-status';
+      document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
+      escaneado = false;
 
-// Al volver del escáner con SKU en la URL
-window.addEventListener('load', () => {
-  const params = new URLSearchParams(window.location.search);
-  const sku    = params.get('sku');
-  if (sku) {
-    document.getElementById('skuInput').value = sku;
-    buscar();
-  }
-});
+      scanner = new Html5Qrcode('reader');
+      const config = {
+        fps: 15,
+        qrbox: { width: 280, height: 110 },
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+        ]
+      };
+
+      try {
+        const camaras = await Html5Qrcode.getCameras();
+        let camaraId;
+
+        if (camaras.length > 1) {
+          const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
+          camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
+
+          const selector = document.createElement('select');
+          selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
+          camaras.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.label || `Cámara ${c.id}`;
+            if (c.id === camaraId) opt.selected = true;
+            selector.appendChild(opt);
+          });
+          selector.addEventListener('change', async () => {
+            await scanner.stop();
+            await scanner.start(selector.value, config,
+              d => { if (!escaneado) exitoScanner(d); }, () => {});
+          });
+          document.querySelector('.scanner-viewport').appendChild(selector);
+        } else {
+          camaraId = camaras[0]?.id || { facingMode: 'environment' };
+        }
+
+        await scanner.start(camaraId, config,
+          decoded => { if (!escaneado) exitoScanner(decoded); },
+          () => {}
+        );
+
+        document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
+
+      } catch(err) {
+        document.getElementById('scannerStatusText').innerHTML =
+          '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
+      }
+    }
+
+    function exitoScanner(codigo) {
+      escaneado = true;
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+      const bar = document.getElementById('scannerStatus');
+      bar.className = 'scanner-status success';
+      bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
+      setTimeout(() => {
+        cerrarScanner();
+        input.value = codigo;
+        buscar();
+      }, 900);
+    }
+
+    function cerrarScanner() {
+      if (scanner) {
+        scanner.stop().catch(() => {}).finally(() => { scanner = null; });
+      }
+      document.querySelector('.scanner-viewport select')?.remove();
+      document.getElementById('scannerOverlay').classList.add('hidden');
+      document.getElementById('scannerManualInput').value = '';
+      escaneado = false;
+    }
+
+    function confirmarManualScanner() {
+      const val = document.getElementById('scannerManualInput').value.trim();
+      if (val) exitoScanner(val);
+    }
+
+    document.getElementById('scannerManualInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmarManualScanner();
+    });
+
+    function esc(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
   </script>
 </body>
 </html>
