@@ -192,21 +192,49 @@
         ]
       };
 
-      try {
-        await scanner.start(
-          { facingMode: 'environment' },
-          config,
-          (decodedText) => {
-            if (!escaneado) exito(decodedText);
-          },
-          () => {} // error silencioso mientras escanea
-        );
-      } catch(err) {
-        document.getElementById('statusText').innerHTML =
-          `<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo`;
-        console.error(err);
-      }
-    }
+     try {
+  // Obtener cámaras disponibles y preferir trasera
+  const camaras = await Html5Qrcode.getCameras();
+  let camaraId;
+
+  if (camaras.length > 1) {
+    const trasera = camaras.find(c =>
+      /back|rear|trasera|environment|0/i.test(c.label)
+    );
+    camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
+
+    const selector = document.createElement('select');
+    selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#1a3a2a;color:#fff;border:1px solid #74c69d;border-radius:8px;padding:6px 10px;font-size:13px;max-width:80%';
+    camaras.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.label || `Cámara ${c.id}`;
+      if (c.id === camaraId) opt.selected = true;
+      selector.appendChild(opt);
+    });
+    selector.addEventListener('change', async () => {
+      await scanner.stop();
+      await scanner.start(selector.value, config,
+        d => { if (!escaneado) exito(d); }, () => {});
+    });
+    document.querySelector('.viewport').appendChild(selector);
+  } else {
+    camaraId = camaras[0]?.id || { facingMode: 'environment' };
+  }
+
+  await scanner.start(
+    camaraId,
+    config,
+    (decodedText) => {
+      if (!escaneado) exito(decodedText);
+    },
+    () => {}
+  );
+} catch(err) {
+  document.getElementById('statusText').innerHTML =
+    `<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo`;
+  console.error(err);
+}
 
     function exito(codigo) {
       escaneado = true;
