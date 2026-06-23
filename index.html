@@ -713,84 +713,119 @@
     }
 
     // ── SCANNER ──
-    async function abrirScanner() {
-      document.getElementById('scannerOverlay').classList.remove('hidden');
-      document.getElementById('scannerStatus').className = 'scanner-status';
-      document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
-      escaneado = false;
+async function abrirScanner() {
+  document.getElementById('scannerOverlay').classList.remove('hidden');
+  document.getElementById('scannerStatus').className = 'scanner-status';
+  document.getElementById('scannerStatusText').textContent = 'Detectando cámaras…';
+  escaneado = false;
 
-      scanner = new Html5Qrcode('reader');
-      const config = {
-        fps: 15,
-        qrbox: { width: 280, height: 110 },
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-        ]
-      };
+  scanner = new Html5Qrcode('reader');
+  const config = {
+    fps: 15,
+    qrbox: { width: 280, height: 110 },
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+    ]
+  };
 
-      try {
-        const camaras = await Html5Qrcode.getCameras();
-        let camaraId;
+  try {
+    const camaras = await Html5Qrcode.getCameras();
+    if (!camaras || camaras.length === 0) throw new Error('No se encontraron cámaras.');
 
-        if (camaras.length > 1) {
-          const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
-          camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
-
-          const selector = document.createElement('select');
-          selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
-          camaras.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = c.label || `Cámara ${c.id}`;
-            if (c.id === camaraId) opt.selected = true;
-            selector.appendChild(opt);
-          });
-          selector.addEventListener('change', async () => {
-            await scanner.stop();
-            await scanner.start(selector.value, config,
-              d => { if (!escaneado) exitoScanner(d); }, () => {});
-          });
-          document.querySelector('.scanner-viewport').appendChild(selector);
-        } else {
-          camaraId = camaras[0]?.id || { facingMode: 'environment' };
-        }
-
-        await scanner.start(camaraId, config,
-          decoded => { if (!escaneado) exitoScanner(decoded); },
-          () => {}
-        );
-
-        document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
-
-      } catch(err) {
-        document.getElementById('scannerStatusText').innerHTML =
-          '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
-      }
+    if (camaras.length === 1) {
+      // Una sola cámara — iniciar directo
+      iniciarCamaraScanner(camaras[0].id, config);
+    } else {
+      // Varias cámaras — mostrar selector con botones
+      document.getElementById('scannerStatusText').textContent = 'Elige una cámara para continuar';
+      mostrarSelectorCamaras(camaras, config);
     }
+  } catch(err) {
+    document.getElementById('scannerStatusText').innerHTML =
+      '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
+  }
+}
 
-    function exitoScanner(codigo) {
-      escaneado = true;
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-      const bar = document.getElementById('scannerStatus');
-      bar.className = 'scanner-status success';
-      bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
-      setTimeout(() => {
-        cerrarScanner();
-        input.value = codigo;
-        buscar();
-      }, 900);
-    }
+function mostrarSelectorCamaras(camaras, config) {
+  // Eliminar selector anterior si existe
+  document.getElementById('camSelector')?.remove();
+
+  const wrap = document.createElement('div');
+  wrap.id = 'camSelector';
+  wrap.style.cssText = `
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.92); z-index:20;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:24px; gap:12px;
+  `;
+
+  const titulo = document.createElement('p');
+  titulo.textContent = '📷 Selecciona la cámara';
+  titulo.style.cssText = 'color:#fff; font-size:15px; font-weight:700; margin-bottom:4px;';
+  wrap.appendChild(titulo);
+
+  const sub = document.createElement('p');
+  sub.textContent = 'Se detectaron varias cámaras en tu dispositivo';
+  sub.style.cssText = 'color:rgba(255,255,255,0.5); font-size:12px; margin-bottom:8px; text-align:center;';
+  wrap.appendChild(sub);
+
+  camaras.forEach((cam, idx) => {
+    const btn = document.createElement('button');
+    const esTrasera = /back|rear|trasera|environment/i.test(cam.label);
+    btn.innerHTML = `
+      <span style="font-size:18px">${esTrasera ? '📷' : '🤳'}</span>
+      <span style="flex:1;text-align:left">
+        <strong style="display:block;font-size:14px">${cam.label || 'Cámara ' + (idx+1)}</strong>
+        <small style="color:rgba(255,255,255,0.5);font-size:11px">${esTrasera ? 'Cámara trasera' : 'Cámara frontal'}</small>
+      </span>
+      ${esTrasera ? '<span style="font-size:11px;background:#16a34a;color:#fff;padding:3px 8px;border-radius:10px;font-weight:700">Recomendada</span>' : ''}
+    `;
+    btn.style.cssText = `
+      width:100%; max-width:340px;
+      display:flex; align-items:center; gap:12px;
+      background:${esTrasera ? 'rgba(37,99,235,0.2)' : 'rgba(255,255,255,0.08)'};
+      border:1.5px solid ${esTrasera ? '#2563eb' : 'rgba(255,255,255,0.15)'};
+      border-radius:12px; padding:14px 16px;
+      color:#fff; font-family:inherit; cursor:pointer;
+      transition:background 0.15s;
+      -webkit-tap-highlight-color:transparent;
+    `;
+    btn.addEventListener('click', () => {
+      wrap.remove();
+      iniciarCamaraScanner(cam.id, config);
+    });
+    wrap.appendChild(btn);
+  });
+
+  document.querySelector('.scanner-viewport').appendChild(wrap);
+}
+
+async function iniciarCamaraScanner(camaraId, config) {
+  document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
+  try {
+    await scanner.start(
+      camaraId,
+      config,
+      decoded => { if (!escaneado) exitoScanner(decoded); },
+      () => {}
+    );
+  } catch(err) {
+    document.getElementById('scannerStatusText').innerHTML =
+      '<strong style="color:#fca5a5">Error al iniciar cámara</strong>Usa el campo de abajo';
+  }
+}
 
     function cerrarScanner() {
       if (scanner) {
         scanner.stop().catch(() => {}).finally(() => { scanner = null; });
       }
-      document.querySelector('.scanner-viewport select')?.remove();
+      document.getElementById('camSelector')?.remove();
       document.getElementById('scannerOverlay').classList.add('hidden');
       document.getElementById('scannerManualInput').value = '';
       escaneado = false;
