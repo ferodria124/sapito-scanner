@@ -13,7 +13,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      /* Paleta limpia azul/blanco/gris */
       --azul-900: #1e293b;
       --azul-800: #1e40af;
       --azul-700: #1d4ed8;
@@ -23,12 +22,8 @@
       --azul-300: #93c5fd;
       --azul-100: #dbeafe;
       --azul-50:  #eff6ff;
-
-      /* Acento */
       --cian:       #2563eb;
       --cian-suave: #dbeafe;
-
-      /* Neutros */
       --blanco:   #ffffff;
       --gris-900: #111827;
       --gris-700: #374151;
@@ -36,18 +31,13 @@
       --gris-200: #e5e7eb;
       --gris-100: #f3f4f6;
       --gris-50:  #f9fafb;
-
-      /* Fondo general */
       --fondo:    #f0f2f5;
-
-      /* Semáforo stock — se mantienen */
       --verde:      #16a34a;
       --verde-bg:   #dcfce7;
       --amarillo:   #d97706;
       --amarillo-bg:#fef3c7;
       --rojo:       #dc2626;
       --rojo-bg:    #fee2e2;
-
       --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
       --radio: 14px;
       --sombra: 0 4px 24px rgba(0,0,0,0.18);
@@ -55,7 +45,6 @@
     }
 
     html { height: 100%; -webkit-text-size-adjust: 100%; }
-
     body {
       font-family: var(--font);
       background: var(--fondo);
@@ -88,30 +77,31 @@
     .header-text { flex: 1; min-width: 0; }
     .header-eyebrow {
       font-size: 9px; font-weight: 700; letter-spacing: 2.5px;
-      text-transform: uppercase; color: var(--azul-500);
-      margin-bottom: 2px;
+      text-transform: uppercase; color: var(--azul-500); margin-bottom: 2px;
     }
     .header-title {
-      .header-inner { flex-wrap: nowrap; gap: 10px; }
-      .logo { height: 30px; }
-      .logo-wrap { padding: 6px 8px; }
-      .header-eyebrow { font-size: 8px; letter-spacing: 1.5px; }
-      .header-title { font-size: 17px; }
-      .header-title .ver { font-size: 19px; }
-      .header-loc { font-size: 10px; }
       font-size: 20px; font-weight: 900; color: var(--gris-900);
       letter-spacing: -0.5px; line-height: 1;
     }
-    .header-title .ver {
-      color: var(--cian);
-      font-size: 22px;
+    .header-title .ver { color: var(--cian); font-size: 22px; }
+    .header-loc { font-size: 11px; color: var(--gris-500); margin-top: 3px; font-weight: 500; }
+
+    /* ── CACHE PILL ── */
+    .cache-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 600; padding: 4px 10px;
+      border-radius: 20px; border: 1px solid var(--gris-200);
+      background: var(--gris-50); color: var(--gris-500);
+      transition: all 0.3s;
     }
-    .header-loc {
-      font-size: 11px; color: var(--gris-500);
-      margin-top: 3px; font-weight: 500;
+    .cache-pill.loading { background: var(--azul-50); border-color: var(--azul-300); color: var(--azul-500); }
+    .cache-pill.ready   { background: var(--verde-bg); border-color: var(--verde); color: var(--verde); }
+    .cache-pill.error   { background: var(--rojo-bg); border-color: var(--rojo); color: var(--rojo); }
+    .cache-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: currentColor;
     }
-    
-    }
+    .cache-dot.pulsing { animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
     /* ── MAIN ── */
     .main {
@@ -142,6 +132,7 @@
     .input-icon {
       position: absolute; left: 13px; top: 50%;
       transform: translateY(-50%); font-size: 15px; pointer-events: none;
+      z-index: 1;
     }
     .search-input {
       width: 100%; padding: 13px 13px 13px 40px;
@@ -156,25 +147,46 @@
     }
     .search-input::placeholder { color: #9ca3af; }
 
-    /* Suggestions */
+    /* ── SUGGESTIONS — ESTABLE Y DESLIZABLE ── */
     .suggestions {
       position: absolute; top: calc(100% + 6px); left: 0; right: 0;
       background: var(--blanco); border: 1.5px solid var(--azul-400);
       border-radius: 11px; box-shadow: var(--sombra-lg);
-      z-index: 100; overflow: hidden;
+      z-index: 200;
+      /* Scroll sin salirse */
+      max-height: 320px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
     .suggestions.hidden { display: none; }
-    .suggestion-item {
-      padding: 11px 14px; cursor: pointer;
+
+    /* Encabezado fijo dentro del dropdown */
+    .sugg-header-sticky {
+      position: sticky; top: 0;
+      padding: 7px 14px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--gris-500);
+      background: var(--gris-50);
       border-bottom: 1px solid var(--gris-200);
-      transition: background 0.12s;
-      min-height: 44px; display: flex; flex-direction: column; justify-content: center;
+      z-index: 1;
+    }
+
+    .suggestion-item {
+      padding: 12px 14px; cursor: pointer;
+      border-bottom: 1px solid var(--gris-100);
+      transition: background 0.1s;
+      min-height: 48px; display: flex; flex-direction: column; justify-content: center;
+      /* Evitar que el toque cierre el dropdown */
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
     .suggestion-item:last-child { border-bottom: none; }
-    .suggestion-item:hover, .suggestion-item.active { background: var(--fondo); }
+    .suggestion-item:hover, .suggestion-item.active { background: var(--azul-50); }
+    .suggestion-item:active { background: var(--azul-100); }
     .sugg-label { font-size: 10px; color: var(--gris-500); font-family: monospace; }
-    .sugg-desc  { font-size: 13px; font-weight: 600; color: var(--gris-900); margin-top: 1px; }
+    .sugg-desc  { font-size: 13px; font-weight: 600; color: var(--gris-900); margin-top: 2px; line-height: 1.3; }
     .sugg-badge {
       display: inline-block; font-size: 9px; font-weight: 700;
       padding: 2px 7px; border-radius: 10px; margin-left: 6px;
@@ -238,7 +250,6 @@
       font-size: 17px; font-weight: 900; color: var(--blanco);
       font-family: monospace; letter-spacing: 0.5px;
     }
-
     .res-body { padding: 18px; }
     .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -247,19 +258,14 @@
       border-radius: 11px; padding: 14px;
     }
     .res-field.span2 { grid-column: 1 / -1; }
-    .res-field.desc-field {
-      background: var(--fondo); border-color: var(--azul-100);
-    }
+    .res-field.desc-field { background: var(--fondo); border-color: var(--azul-100); }
     .res-field-label {
       font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
       text-transform: uppercase; color: var(--gris-500); margin-bottom: 6px;
     }
     .res-field.desc-field .res-field-label { color: var(--azul-500); }
-    .res-field-value {
-      font-size: 14px; font-weight: 600; color: var(--gris-900); line-height: 1.4;
-    }
+    .res-field-value { font-size: 14px; font-weight: 600; color: var(--gris-900); line-height: 1.4; }
 
-    /* Stock display */
     .stock-num {
       font-size: 52px; font-weight: 900; line-height: 1;
       letter-spacing: -2px; color: var(--gris-900);
@@ -278,7 +284,6 @@
     .badge-low  { background: var(--amarillo-bg); color: var(--amarillo); }
     .badge-zero { background: var(--rojo-bg);     color: var(--rojo); }
 
-    /* Error / Loading */
     .res-error { padding: 22px; display: flex; align-items: center; gap: 14px; }
     .error-icon { font-size: 28px; flex-shrink: 0; }
     .error-title { font-size: 15px; font-weight: 700; color: var(--rojo); }
@@ -293,14 +298,10 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading p { font-size: 14px; color: var(--gris-500); }
 
-    /* Empty state */
-    .empty-state {
-      text-align: center; padding: 52px 20px; color: var(--gris-500);
-    }
+    .empty-state { text-align: center; padding: 52px 20px; color: var(--gris-500); }
     .empty-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.6; }
     .empty-text { font-size: 15px; line-height: 1.5; max-width: 260px; margin: 0 auto; }
 
-    /* Footer */
     .footer {
       text-align: center; padding: 16px;
       font-size: 11px; color: var(--gris-500);
@@ -309,16 +310,12 @@
       padding-bottom: calc(16px + env(safe-area-inset-bottom));
     }
 
-    /* ══════════════════════════════════════
-       SCANNER POPUP
-    ══════════════════════════════════════ */
+    /* ══ SCANNER ══ */
     .scanner-overlay {
-      position: fixed; inset: 0;
-      background: #000;
+      position: fixed; inset: 0; background: #000;
       z-index: 999; display: flex; flex-direction: column;
     }
     .scanner-overlay.hidden { display: none; }
-
     .scanner-header {
       background: linear-gradient(135deg, #0f172a, #1e293b);
       padding: 14px 20px;
@@ -334,30 +331,24 @@
       padding: 7px 16px; border-radius: 20px; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
-
-    .scanner-viewport {
-      position: relative; flex: 1; overflow: hidden; background: #000;
-    }
+    .scanner-viewport { position: relative; flex: 1; overflow: hidden; background: #000; }
     #reader { width: 100% !important; height: 100% !important; border: none !important; }
     #reader__dashboard_section_swaplink,
     #reader__dashboard_section_fileselection,
     #reader__filescan_input,
     #reader__scan_region img { display: none !important; }
     #reader__scan_region { border: none !important; background: transparent !important; }
-
     .scan-ui { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
     .s-dark-top    { position: absolute; top: 0; left: 0; right: 0; height: 22%; background: rgba(0,0,0,0.6); }
     .s-dark-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 28%; background: rgba(0,0,0,0.6); }
     .s-dark-left   { position: absolute; top: 22%; bottom: 28%; left: 0; width: 7%; background: rgba(0,0,0,0.6); }
     .s-dark-right  { position: absolute; top: 22%; bottom: 28%; right: 0; width: 7%; background: rgba(0,0,0,0.6); }
     .s-window      { position: absolute; top: 22%; bottom: 28%; left: 7%; right: 7%; }
-
     .s-corner { position: absolute; width: 24px; height: 24px; border-color: var(--cian); border-style: solid; }
     .s-corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 5px 0 0 0; }
     .s-corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 5px 0 0; }
     .s-corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 5px; }
     .s-corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 5px 0; }
-
     .s-line {
       position: absolute; left: 4px; right: 4px; height: 2px;
       background: linear-gradient(90deg, transparent, var(--cian), transparent);
@@ -376,19 +367,15 @@
       color: rgba(255,255,255,0.7); padding: 0 20px;
       text-shadow: 0 1px 6px rgba(0,0,0,0.9);
     }
-
     .scanner-status {
       background: #0f172a; padding: 13px 20px;
       display: flex; align-items: center; justify-content: center; gap: 10px;
       flex-shrink: 0; min-height: 58px;
       border-top: 1px solid rgba(59,130,246,0.15);
     }
-    .scanner-status.success {
-      background: linear-gradient(135deg, #064e3b, var(--verde));
-    }
+    .scanner-status.success { background: linear-gradient(135deg, #064e3b, var(--verde)); }
     .scan-status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
     .scan-status-text strong { color: var(--blanco); display: block; font-size: 15px; }
-
     .scanner-manual {
       background: #0d1117; padding: 10px 14px;
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
@@ -424,6 +411,8 @@
       .res-grid { grid-template-columns: 1fr; }
       .res-field.span2 { grid-column: 1; }
       .stock-num { font-size: 44px; }
+      /* Dropdown más chico en móvil para no tapar todo */
+      .suggestions { max-height: 260px; }
     }
   </style>
 </head>
@@ -444,13 +433,16 @@
         <div class="header-title">Control Sapito <span class="ver">3.0</span></div>
         <div class="header-loc">📍 Algarrobo</div>
       </div>
-     
+      <!-- Indicador de caché -->
+      <div class="cache-pill" id="cachePill">
+        <div class="cache-dot pulsing" id="cacheDot"></div>
+        <span id="cacheLabel">Cargando…</span>
+      </div>
     </div>
   </header>
 
   <!-- MAIN -->
   <main class="main">
-
     <div class="search-card">
       <div class="search-eyebrow">Consultar stock</div>
       <div class="search-row">
@@ -461,6 +453,7 @@
             placeholder="SKU, código madre o descripción…"
             autocomplete="off" class="search-input"
           />
+          <!-- Dropdown: pointer-events on para capturar toques sin cerrar -->
           <div id="suggestions" class="suggestions hidden"></div>
         </div>
         <button class="btn-cam" onclick="abrirScanner()" title="Escanear código">📷</button>
@@ -474,7 +467,6 @@
       <div class="empty-icon">📦</div>
       <p class="empty-text">Ingresa un SKU, código madre o descripción para consultar el stock en bodega.</p>
     </div>
-
   </main>
 
   <footer class="footer">
@@ -520,295 +512,446 @@
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
-    // ── CONFIG ──
-    const API = 'https://script.google.com/macros/s/AKfycbzKBa24qpv5CSVtu2hF_34HFg9AiQ_zGi8rf5Ph3nUW-58dS2fW_tCNdiZbrPRaAqdXAQ/exec';
+  // ═══════════════════════════════════════════════
+  //  CONFIG
+  // ═══════════════════════════════════════════════
+  const API = 'https://script.google.com/macros/s/AKfycbxHTWp9tI89AHB_SfdTAHTmYk2m_iuIDZczOuJhyutcIX2Ex1m4hZ9ChDdii-tP8cC22A/exec';
 
-    // ── Estado ──
-    let sugerenciaActiva = -1;
-    let timeoutSugerencias;
-    let scanner   = null;
-    let escaneado = false;
+  // ═══════════════════════════════════════════════
+  //  CACHÉ LOCAL — prefetch de Base de Datos
+  //  Se carga UNA vez al abrir la app, luego la
+  //  búsqueda por descripción y código madre es
+  //  instantánea sin más llamadas al backend.
+  // ═══════════════════════════════════════════════
+  const Cache = {
+    bd: [],          // [{sku, desc, cod}]
+    skus: [],        // [sku, sku, …] para sugerencias numéricas
+    listo: false,
+    error: false,
+  };
 
-    const input       = document.getElementById('skuInput');
-    const suggestions = document.getElementById('suggestions');
-    const resultado   = document.getElementById('resultado');
-    const estadoVacio = document.getElementById('estadoVacio');
+  const cachePill  = document.getElementById('cachePill');
+  const cacheDot   = document.getElementById('cacheDot');
+  const cacheLabel = document.getElementById('cacheLabel');
 
-    // ── JSONP ──
-    function jsonp(url, callback) {
-      const fn  = '_cb' + Date.now();
-      document.getElementById('_jsonp')?.remove();
-      window[fn] = data => {
-        try { delete window[fn]; } catch(e) {}
-        document.getElementById('_jsonp')?.remove();
-        callback(data);
-      };
-      const s = document.createElement('script');
-      s.id = '_jsonp'; s.src = url + '&callback=' + fn;
-      s.onerror = () => { try { delete window[fn]; } catch(e) {} this?.remove(); callback(null); };
-      document.head.appendChild(s);
-    }
+  function setCachePill(estado, texto) {
+    cachePill.className = 'cache-pill ' + estado;
+    cacheLabel.textContent = texto;
+    cacheDot.className = 'cache-dot' + (estado === 'loading' ? ' pulsing' : '');
+  }
 
-    // ── Teclado ──
-    input.addEventListener('keydown', e => {
-      const items = suggestions.querySelectorAll('.suggestion-item');
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        sugerenciaActiva = Math.min(sugerenciaActiva + 1, items.length - 1);
-        items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        sugerenciaActiva = Math.max(sugerenciaActiva - 1, -1);
-        items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
-      } else if (e.key === 'Enter') {
-        const active = items[sugerenciaActiva];
-        if (active) { input.value = active.dataset.sku; cerrarSugerencias(); }
-        buscar();
-      } else if (e.key === 'Escape') {
-        cerrarSugerencias();
+  // Inicia la carga en segundo plano apenas carga la página
+  function cargarCache() {
+    setCachePill('loading', 'Cargando…');
+
+    // Pedimos todos los datos de Base de Datos al backend
+    // (agregamos action=prefetch que devuelve array completo)
+    jsonp(API + '?action=prefetch', data => {
+      if (data && Array.isArray(data) && data.length > 0) {
+        Cache.bd   = data;                           // [{sku, desc, cod}]
+        Cache.skus = [...new Set(data.map(r => r.sku).filter(Boolean))];
+        Cache.listo = true;
+        setCachePill('ready', Cache.bd.length.toLocaleString('es-CL') + ' prods.');
+      } else {
+        Cache.error = true;
+        setCachePill('error', 'Sin caché');
+        // No rompemos la app: las búsquedas caen al backend normal
       }
     });
+  }
 
-    // ── Autocompletar ──
-    input.addEventListener('input', function() {
-      clearTimeout(timeoutSugerencias);
-      const val = this.value.trim();
-      if (val.length < 2) { cerrarSugerencias(); return; }
-
-      timeoutSugerencias = setTimeout(() => {
-        const esNum = /^\d+$/.test(val);
-        if (esNum && val.length >= 5) {
-          jsonp(API + '?action=codigoMadre&codigo=' + encodeURIComponent(val), lista => {
-            if (lista && lista.length > 0) mostrarSugerenciasDesc(lista, true);
-            else jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
-              skus => skus ? mostrarSugerencias(skus.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
-            );
-          });
-        } else if (esNum) {
-          jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
-            lista => lista ? mostrarSugerencias(lista.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
-          );
-        } else {
-          jsonp(API + '?action=descripcion&texto=' + encodeURIComponent(val),
-            lista => lista ? mostrarSugerenciasDesc(lista, false) : cerrarSugerencias()
-          );
-        }
-      }, 300);
-    });
-
-    function mostrarSugerencias(lista) {
-      if (!lista || !lista.length) { cerrarSugerencias(); return; }
-      sugerenciaActiva = -1;
-      suggestions.innerHTML = lista.map(s =>
-        `<div class="suggestion-item" data-sku="${s.sku}" onclick="elegirSugerencia('${s.sku}')">
-          <span class="sugg-desc">${esc(s.sku)}</span>
-        </div>`
-      ).join('');
-      suggestions.classList.remove('hidden');
+  // ── Búsqueda local en caché (instantánea) ──
+  function buscarEnCacheDescripcion(texto) {
+    const q = texto.trim().toUpperCase();
+    const res = [];
+    for (const r of Cache.bd) {
+      if ((r.desc || '').toUpperCase().includes(q)) {
+        res.push(r);
+        if (res.length >= 8) break;
+      }
     }
+    return res;
+  }
 
-    function mostrarSugerenciasDesc(lista, esMadre) {
-      if (!lista || !lista.length) { cerrarSugerencias(); return; }
-      sugerenciaActiva = -1;
-      const header = esMadre
-        ? `<div style="padding:7px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6b7280;background:#f9fafb;border-bottom:1px solid #e5e7eb">
-            📦 ${lista.length} variante${lista.length>1?'s':''} encontrada${lista.length>1?'s':''}
-           </div>` : '';
-      suggestions.innerHTML = header + lista.map(s =>
-        `<div class="suggestion-item" data-sku="${s.sku}" onclick="elegirSugerencia('${s.sku}')">
-          <span class="sugg-label">${esc(s.sku)}</span>
-          <span class="sugg-desc">${esc(s.desc)}</span>
-        </div>`
-      ).join('');
-      suggestions.classList.remove('hidden');
+  function buscarEnCacheCodigoMadre(codigo) {
+    const q = codigo.trim().toUpperCase();
+    const res = [];
+    for (const r of Cache.bd) {
+      if ((r.cod || '').toUpperCase() === q) {
+        res.push(r);
+        if (res.length >= 50) break;
+      }
     }
+    return res;
+  }
 
-    function elegirSugerencia(sku) {
-      input.value = sku; cerrarSugerencias(); buscar();
+  function sugerirEnCacheSku(prefijo) {
+    const res = [];
+    const seen = new Set();
+    for (const s of Cache.skus) {
+      if (s.startsWith(prefijo) && !seen.has(s)) {
+        seen.add(s); res.push(s);
+        if (res.length >= 8) break;
+      }
     }
+    return res;
+  }
 
-    function cerrarSugerencias() {
-      suggestions.classList.add('hidden');
-      suggestions.innerHTML = '';
-      sugerenciaActiva = -1;
-    }
+  // ═══════════════════════════════════════════════
+  //  JSONP (fallback para buscarSKU)
+  // ═══════════════════════════════════════════════
+  function jsonp(url, callback) {
+    const fn = '_cb' + Date.now();
+    document.getElementById('_jsonp')?.remove();
+    window[fn] = data => {
+      try { delete window[fn]; } catch(e) {}
+      document.getElementById('_jsonp')?.remove();
+      callback(data);
+    };
+    const s = document.createElement('script');
+    s.id = '_jsonp';
+    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + fn;
+    s.onerror = () => { try { delete window[fn]; } catch(e) {} s.remove(); callback(null); };
+    document.head.appendChild(s);
+  }
 
-    document.addEventListener('click', e => {
-      if (!e.target.closest('.input-wrap')) cerrarSugerencias();
-    });
+  // ═══════════════════════════════════════════════
+  //  ELEMENTOS DOM
+  // ═══════════════════════════════════════════════
+  const input       = document.getElementById('skuInput');
+  const suggestions = document.getElementById('suggestions');
+  const resultado   = document.getElementById('resultado');
+  const estadoVacio = document.getElementById('estadoVacio');
 
-    // ── Buscar ──
-    function buscar() {
-      const sku = input.value.trim();
-      if (!sku) { input.focus(); return; }
+  let sugerenciaActiva = -1;
+  let timeoutSugerencias;
+
+  // ═══════════════════════════════════════════════
+  //  DROPDOWN — CONTROL DE APERTURA / CIERRE
+  //  Se cierra SOLO si el clic/toque es FUERA
+  //  del .input-wrap completo.
+  // ═══════════════════════════════════════════════
+  let dropdownTouching = false; // bandera para evitar blur prematuro en móvil
+
+  suggestions.addEventListener('touchstart', () => { dropdownTouching = true; }, { passive: true });
+  suggestions.addEventListener('touchend',   () => {
+    dropdownTouching = false;
+  }, { passive: true });
+
+  // Al perder el foco el input, esperamos un tick para saber si fue
+  // un toque dentro del dropdown (en cuyo caso NO cerramos)
+  input.addEventListener('blur', () => {
+    setTimeout(() => {
+      if (!dropdownTouching) cerrarSugerencias();
+    }, 150);
+  });
+
+  // Clic fuera en desktop
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.input-wrap')) cerrarSugerencias();
+  });
+
+  // ═══════════════════════════════════════════════
+  //  TECLADO
+  // ═══════════════════════════════════════════════
+  input.addEventListener('keydown', e => {
+    const items = suggestions.querySelectorAll('.suggestion-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      sugerenciaActiva = Math.min(sugerenciaActiva + 1, items.length - 1);
+      items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
+      items[sugerenciaActiva]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      sugerenciaActiva = Math.max(sugerenciaActiva - 1, -1);
+      items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
+      items[sugerenciaActiva]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      const active = items[sugerenciaActiva];
+      if (active) { input.value = active.dataset.sku; cerrarSugerencias(); }
+      buscar();
+    } else if (e.key === 'Escape') {
       cerrarSugerencias();
-      mostrarLoading();
-      jsonp(API + '?action=buscar&sku=' + encodeURIComponent(sku), data => {
-        data ? mostrarResultado(data) : mostrarErrorConexion({message:'Sin respuesta del servidor.'});
-      });
+    }
+  });
+
+  // ═══════════════════════════════════════════════
+  //  AUTOCOMPLETAR — usa caché local si está listo
+  // ═══════════════════════════════════════════════
+  input.addEventListener('input', function() {
+    clearTimeout(timeoutSugerencias);
+    const val = this.value.trim();
+    if (val.length < 2) { cerrarSugerencias(); return; }
+
+    // Si el caché ya está listo, respuesta instantánea (0 ms de red)
+    if (Cache.listo) {
+      const esNum = /^\d+$/.test(val);
+      if (esNum && val.length >= 5) {
+        const porMadre = buscarEnCacheCodigoMadre(val);
+        if (porMadre.length > 0) {
+          mostrarSugerenciasDesc(porMadre, true);
+        } else {
+          const porSku = sugerirEnCacheSku(val).map(s => ({ sku: s, desc: '' }));
+          porSku.length ? mostrarSugerencias(porSku) : cerrarSugerencias();
+        }
+      } else if (esNum) {
+        const porSku = sugerirEnCacheSku(val).map(s => ({ sku: s, desc: '' }));
+        porSku.length ? mostrarSugerencias(porSku) : cerrarSugerencias();
+      } else {
+        const porDesc = buscarEnCacheDescripcion(val);
+        porDesc.length ? mostrarSugerenciasDesc(porDesc, false) : cerrarSugerencias();
+      }
+      return; // sin red
     }
 
-    function mostrarLoading() {
-      estadoVacio.style.display = 'none';
-      resultado.classList.remove('hidden');
-      resultado.innerHTML = `<div class="loading"><div class="spinner"></div><p>Consultando bodega…</p></div>`;
+    // Fallback: backend vía JSONP (cuando caché aún no cargó)
+    timeoutSugerencias = setTimeout(() => {
+      const esNum = /^\d+$/.test(val);
+      if (esNum && val.length >= 5) {
+        jsonp(API + '?action=codigoMadre&codigo=' + encodeURIComponent(val), lista => {
+          if (lista && lista.length > 0) mostrarSugerenciasDesc(lista, true);
+          else jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+            skus => skus ? mostrarSugerencias(skus.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+          );
+        });
+      } else if (esNum) {
+        jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+          lista => lista ? mostrarSugerencias(lista.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+        );
+      } else {
+        jsonp(API + '?action=descripcion&texto=' + encodeURIComponent(val),
+          lista => lista ? mostrarSugerenciasDesc(lista, false) : cerrarSugerencias()
+        );
+      }
+    }, 300);
+  });
+
+  // ═══════════════════════════════════════════════
+  //  RENDER SUGERENCIAS
+  // ═══════════════════════════════════════════════
+  function mostrarSugerencias(lista) {
+    if (!lista || !lista.length) { cerrarSugerencias(); return; }
+    sugerenciaActiva = -1;
+    suggestions.innerHTML = lista.map(s =>
+      `<div class="suggestion-item" data-sku="${esc(s.sku)}" onmousedown="elegirSugerencia('${esc(s.sku)}')">
+        <span class="sugg-desc">${esc(s.sku)}</span>
+      </div>`
+    ).join('');
+    suggestions.classList.remove('hidden');
+  }
+
+  function mostrarSugerenciasDesc(lista, esMadre) {
+    if (!lista || !lista.length) { cerrarSugerencias(); return; }
+    sugerenciaActiva = -1;
+    const header = esMadre
+      ? `<div class="sugg-header-sticky">📦 ${lista.length} variante${lista.length>1?'s':''} encontrada${lista.length>1?'s':''}</div>`
+      : '';
+    suggestions.innerHTML = header + lista.map(s =>
+      `<div class="suggestion-item" data-sku="${esc(s.sku)}" onmousedown="elegirSugerencia('${esc(s.sku)}')">
+        <span class="sugg-label">${esc(s.sku)}</span>
+        <span class="sugg-desc">${esc(s.desc)}</span>
+      </div>`
+    ).join('');
+    suggestions.classList.remove('hidden');
+  }
+
+  // IMPORTANTE: usamos onmousedown (se ejecuta antes del blur del input)
+  // y también touchstart en el item para que funcione en móvil
+  suggestions.addEventListener('touchstart', e => {
+    const item = e.target.closest('.suggestion-item');
+    if (item) {
+      e.preventDefault(); // evita blur del input y el posible cierre
+      elegirSugerencia(item.dataset.sku);
     }
+  }, { passive: false });
 
-    function mostrarResultado(data) {
-      if (data.success) {
-        const stock = data.stock;
-        const badge = stock === 0
-          ? `<span class="stock-badge badge-zero">Sin stock</span>`
-          : stock <= 5
-          ? `<span class="stock-badge badge-low">Stock bajo</span>`
-          : `<span class="stock-badge badge-ok">Disponible</span>`;
+  function elegirSugerencia(sku) {
+    input.value = sku;
+    cerrarSugerencias();
+    buscar();
+  }
 
-        resultado.innerHTML = `
-          <div class="res-header">
-            <div class="res-icon">📦</div>
-            <div>
-              <div class="res-found-label">Producto encontrado</div>
-              <div class="res-sku">${esc(data.sku)}</div>
+  function cerrarSugerencias() {
+    suggestions.classList.add('hidden');
+    suggestions.innerHTML = '';
+    sugerenciaActiva = -1;
+  }
+
+  // ═══════════════════════════════════════════════
+  //  BUSCAR (consulta stock — siempre al backend)
+  // ═══════════════════════════════════════════════
+  function buscar() {
+    const sku = input.value.trim();
+    if (!sku) { input.focus(); return; }
+    cerrarSugerencias();
+    mostrarLoading();
+    jsonp(API + '?action=buscar&sku=' + encodeURIComponent(sku), data => {
+      data ? mostrarResultado(data) : mostrarErrorConexion({ message: 'Sin respuesta del servidor.' });
+    });
+  }
+
+  function mostrarLoading() {
+    estadoVacio.style.display = 'none';
+    resultado.classList.remove('hidden');
+    resultado.innerHTML = `<div class="loading"><div class="spinner"></div><p>Consultando bodega…</p></div>`;
+  }
+
+  function mostrarResultado(data) {
+    if (data.success) {
+      const stock = data.stock;
+      const badge = stock === 0
+        ? `<span class="stock-badge badge-zero">Sin stock</span>`
+        : stock <= 5
+        ? `<span class="stock-badge badge-low">Stock bajo</span>`
+        : `<span class="stock-badge badge-ok">Disponible</span>`;
+
+      resultado.innerHTML = `
+        <div class="res-header">
+          <div class="res-icon">📦</div>
+          <div>
+            <div class="res-found-label">Producto encontrado</div>
+            <div class="res-sku">${esc(data.sku)}</div>
+          </div>
+        </div>
+        <div class="res-body">
+          <div class="res-grid">
+            <div class="res-field desc-field span2">
+              <div class="res-field-label">Descripción SKU</div>
+              <div class="res-field-value">${esc(data.desc) || '<em style="color:#9ca3af">Sin descripción</em>'}</div>
+            </div>
+            <div class="res-field">
+              <div class="res-field-label">Stock en Bodega</div>
+              <div class="stock-num">${stock.toLocaleString('es-CL')}</div>
+              <div class="stock-unit">unidades</div>
+              ${badge}
+            </div>
+            <div class="res-field">
+              <div class="res-field-label">SKU Consultado</div>
+              <div class="res-field-value" style="font-family:monospace;font-size:15px;word-break:break-all">${esc(String(data.sku))}</div>
             </div>
           </div>
-          <div class="res-body">
-            <div class="res-grid">
-              <div class="res-field desc-field span2">
-                <div class="res-field-label">Descripción SKU</div>
-                <div class="res-field-value">${esc(data.desc) || '<em style="color:#9ca3af">Sin descripción</em>'}</div>
-              </div>
-              <div class="res-field">
-                <div class="res-field-label">Stock en Bodega</div>
-                <div class="stock-num">${stock.toLocaleString('es-CL')}</div>
-                <div class="stock-unit">unidades</div>
-                ${badge}
-              </div>
-              <div class="res-field">
-                <div class="res-field-label">SKU Consultado</div>
-                <div class="res-field-value" style="font-family:monospace;font-size:15px;word-break:break-all">${esc(String(data.sku))}</div>
-              </div>
-            </div>
-          </div>`;
-      } else {
-        resultado.innerHTML = `
-          <div class="res-error">
-            <div class="error-icon">🔎</div>
-            <div>
-              <div class="error-title">No encontrado</div>
-              <div class="error-msg">${esc(data.error)}</div>
-            </div>
-          </div>`;
-      }
-      resultado.classList.remove('hidden');
-    }
-
-    function mostrarErrorConexion(err) {
+        </div>`;
+    } else {
       resultado.innerHTML = `
         <div class="res-error">
-          <div class="error-icon">⚠️</div>
+          <div class="error-icon">🔎</div>
           <div>
-            <div class="error-title">Error de conexión</div>
-            <div class="error-msg">${esc(err.message || 'No se pudo conectar.')}</div>
+            <div class="error-title">No encontrado</div>
+            <div class="error-msg">${esc(data.error)}</div>
           </div>
         </div>`;
     }
+    resultado.classList.remove('hidden');
+  }
 
-    // ── SCANNER ──
-    async function abrirScanner() {
-      document.getElementById('scannerOverlay').classList.remove('hidden');
-      document.getElementById('scannerStatus').className = 'scanner-status';
-      document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
-      escaneado = false;
+  function mostrarErrorConexion(err) {
+    resultado.innerHTML = `
+      <div class="res-error">
+        <div class="error-icon">⚠️</div>
+        <div>
+          <div class="error-title">Error de conexión</div>
+          <div class="error-msg">${esc(err.message || 'No se pudo conectar.')}</div>
+        </div>
+      </div>`;
+  }
 
-      scanner = new Html5Qrcode('reader');
-      const config = {
-        fps: 15,
-        qrbox: { width: 280, height: 110 },
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-        ]
-      };
+  // ═══════════════════════════════════════════════
+  //  SCANNER
+  // ═══════════════════════════════════════════════
+  let scanner   = null;
+  let escaneado = false;
 
-      try {
-        const camaras = await Html5Qrcode.getCameras();
-        let camaraId;
+  async function abrirScanner() {
+    document.getElementById('scannerOverlay').classList.remove('hidden');
+    document.getElementById('scannerStatus').className = 'scanner-status';
+    document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
+    escaneado = false;
 
-        if (camaras.length > 1) {
-          const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
-          camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
+    scanner = new Html5Qrcode('reader');
+    const config = {
+      fps: 15,
+      qrbox: { width: 280, height: 110 },
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+      ]
+    };
 
-          const selector = document.createElement('select');
-          selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
-          camaras.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = c.label || `Cámara ${c.id}`;
-            if (c.id === camaraId) opt.selected = true;
-            selector.appendChild(opt);
-          });
-          selector.addEventListener('change', async () => {
-            await scanner.stop();
-            await scanner.start(selector.value, config,
-              d => { if (!escaneado) exitoScanner(d); }, () => {});
-          });
-          document.querySelector('.scanner-viewport').appendChild(selector);
-        } else {
-          camaraId = camaras[0]?.id || { facingMode: 'environment' };
-        }
+    try {
+      const camaras = await Html5Qrcode.getCameras();
+      let camaraId;
 
-        await scanner.start(camaraId, config,
-          decoded => { if (!escaneado) exitoScanner(decoded); },
-          () => {}
-        );
+      if (camaras.length > 1) {
+        const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
+        camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
 
-        document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
-
-      } catch(err) {
-        document.getElementById('scannerStatusText').innerHTML =
-          '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
+        const selector = document.createElement('select');
+        selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
+        camaras.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id; opt.textContent = c.label || `Cámara ${c.id}`;
+          if (c.id === camaraId) opt.selected = true;
+          selector.appendChild(opt);
+        });
+        selector.addEventListener('change', async () => {
+          await scanner.stop();
+          await scanner.start(selector.value, config, d => { if (!escaneado) exitoScanner(d); }, () => {});
+        });
+        document.querySelector('.scanner-viewport').appendChild(selector);
+      } else {
+        camaraId = camaras[0]?.id || { facingMode: 'environment' };
       }
-    }
 
-    function exitoScanner(codigo) {
-      escaneado = true;
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-      const bar = document.getElementById('scannerStatus');
-      bar.className = 'scanner-status success';
-      bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
-      setTimeout(() => {
-        cerrarScanner();
-        input.value = codigo;
-        buscar();
-      }, 900);
+      await scanner.start(camaraId, config,
+        decoded => { if (!escaneado) exitoScanner(decoded); },
+        () => {}
+      );
+      document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
+    } catch(err) {
+      document.getElementById('scannerStatusText').innerHTML =
+        '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
     }
+  }
 
-    function cerrarScanner() {
-      if (scanner) {
-        scanner.stop().catch(() => {}).finally(() => { scanner = null; });
-      }
-      document.querySelector('.scanner-viewport select')?.remove();
-      document.getElementById('scannerOverlay').classList.add('hidden');
-      document.getElementById('scannerManualInput').value = '';
-      escaneado = false;
-    }
+  function exitoScanner(codigo) {
+    escaneado = true;
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    const bar = document.getElementById('scannerStatus');
+    bar.className = 'scanner-status success';
+    bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
+    setTimeout(() => { cerrarScanner(); input.value = codigo; buscar(); }, 900);
+  }
 
-    function confirmarManualScanner() {
-      const val = document.getElementById('scannerManualInput').value.trim();
-      if (val) exitoScanner(val);
-    }
+  function cerrarScanner() {
+    if (scanner) { scanner.stop().catch(() => {}).finally(() => { scanner = null; }); }
+    document.querySelector('.scanner-viewport select')?.remove();
+    document.getElementById('scannerOverlay').classList.add('hidden');
+    document.getElementById('scannerManualInput').value = '';
+    escaneado = false;
+  }
 
-    document.getElementById('scannerManualInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') confirmarManualScanner();
-    });
+  function confirmarManualScanner() {
+    const val = document.getElementById('scannerManualInput').value.trim();
+    if (val) exitoScanner(val);
+  }
 
-    function esc(s) {
-      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+  document.getElementById('scannerManualInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmarManualScanner();
+  });
+
+  // ═══════════════════════════════════════════════
+  //  UTIL
+  // ═══════════════════════════════════════════════
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Arranque ──
+  cargarCache();
   </script>
 </body>
 </html>
