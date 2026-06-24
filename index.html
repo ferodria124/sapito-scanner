@@ -712,23 +712,31 @@
         </div>`;
     }
 
-    // ── SCANNER ──
 // ── SCANNER ──
-// ── SCANNER ──
+let scanner = null;
+let escaneado = false;
+let scannerAbierto = false;
+
 async function abrirScanner() {
-  // Destruir y recrear el div #reader completamente
+  if (scannerAbierto) return; // evita doble apertura
+  scannerAbierto = true;
+
+  // Reset visual inmediato
+  document.getElementById('scannerStatus').className = 'scanner-status';
+  document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
+  document.getElementById('scannerManualInput').value = '';
+  escaneado = false;
+
+  // Destruir y recrear #reader limpio
   const viewport = document.querySelector('.scanner-viewport');
-  const viejoReader = document.getElementById('reader');
-  if (viejoReader) viejoReader.remove();
+  document.getElementById('reader')?.remove();
+  document.querySelector('.scanner-viewport select')?.remove();
   const nuevoReader = document.createElement('div');
   nuevoReader.id = 'reader';
   viewport.insertBefore(nuevoReader, viewport.firstChild);
 
+  // Mostrar overlay DESPUÉS de limpiar
   document.getElementById('scannerOverlay').classList.remove('hidden');
-  document.getElementById('scannerStatus').className = 'scanner-status';
-  document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
-  escaneado = false;
-  scanner = null;
 
   const config = {
     fps: 15,
@@ -746,8 +754,8 @@ async function abrirScanner() {
   try {
     scanner = new Html5Qrcode('reader');
     const camaras = await Html5Qrcode.getCameras();
-    let camaraId;
 
+    let camaraId;
     if (camaras.length > 1) {
       const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
       camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
@@ -761,13 +769,9 @@ async function abrirScanner() {
         if (c.id === camaraId) opt.selected = true;
         selector.appendChild(opt);
       });
-
       selector.addEventListener('change', async () => {
         if (!scanner) return;
-        try {
-          await scanner.stop();
-        } catch(e) {}
-        // Recrear reader también al cambiar cámara
+        try { await scanner.stop(); } catch(e) {}
         const vp = document.querySelector('.scanner-viewport');
         document.getElementById('reader')?.remove();
         const nr = document.createElement('div');
@@ -777,8 +781,7 @@ async function abrirScanner() {
         await scanner.start(selector.value, config,
           d => { if (!escaneado) exitoScanner(d); }, () => {});
       });
-
-      document.querySelector('.scanner-viewport').appendChild(selector);
+      viewport.appendChild(selector);
     } else {
       camaraId = camaras[0]?.id || { facingMode: 'environment' };
     }
@@ -791,49 +794,55 @@ async function abrirScanner() {
     document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
 
   } catch(err) {
+    scannerAbierto = false;
     document.getElementById('scannerStatusText').innerHTML =
       '<strong style="color:#fca5a5">Sin acceso a cámara</strong> · Usa el campo de abajo';
   }
 }
 
 function exitoScanner(codigo) {
+  if (escaneado) return; // evita doble disparo
   escaneado = true;
   if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
   const bar = document.getElementById('scannerStatus');
   bar.className = 'scanner-status success';
   bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
-  setTimeout(() => {
-    cerrarScanner();
+
+  // Cerrar y buscar con pequeño delay para mostrar el feedback
+  setTimeout(async () => {
+    await cerrarScanner();
     input.value = codigo;
     buscar();
-  }, 900);
+  }, 800);
 }
 
 async function cerrarScanner() {
+  // Parar scanner primero
   if (scanner) {
     try { await scanner.stop(); } catch(e) {}
     scanner = null;
   }
-  // Destruir el reader para que la próxima apertura empiece limpio
+  // Limpiar DOM
   document.getElementById('reader')?.remove();
   document.querySelector('.scanner-viewport select')?.remove();
+  // Ocultar overlay
   document.getElementById('scannerOverlay').classList.add('hidden');
+  // Reset estado
   document.getElementById('scannerManualInput').value = '';
+  document.getElementById('scannerStatus').className = 'scanner-status';
+  document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
   escaneado = false;
+  scannerAbierto = false;
 }
- 
-    function confirmarManualScanner() {
-      const val = document.getElementById('scannerManualInput').value.trim();
-      if (val) exitoScanner(val);
-    }
- 
-    document.getElementById('scannerManualInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') confirmarManualScanner();
-    });
- 
-    function esc(s) {
-      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+
+function confirmarManualScanner() {
+  const val = document.getElementById('scannerManualInput').value.trim();
+  if (val) exitoScanner(val);
+}
+
+document.getElementById('scannerManualInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmarManualScanner();
+});
   </script>
 </body>
 </html>
