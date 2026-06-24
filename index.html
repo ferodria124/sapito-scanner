@@ -712,137 +712,102 @@
         </div>`;
     }
 
-// ── SCANNER ──
-let scanner = null;
-let escaneado = false;
-let scannerAbierto = false;
+    // ── SCANNER ──
+    async function abrirScanner() {
+      document.getElementById('scannerOverlay').classList.remove('hidden');
+      document.getElementById('scannerStatus').className = 'scanner-status';
+      document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
+      escaneado = false;
 
-async function abrirScanner() {
-  if (scannerAbierto) return; // evita doble apertura
-  scannerAbierto = true;
+      scanner = new Html5Qrcode('reader');
+      const config = {
+        fps: 15,
+        qrbox: { width: 280, height: 110 },
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+        ]
+      };
 
-  // Reset visual inmediato
-  document.getElementById('scannerStatus').className = 'scanner-status';
-  document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
-  document.getElementById('scannerManualInput').value = '';
-  escaneado = false;
+      try {
+        const camaras = await Html5Qrcode.getCameras();
+        let camaraId;
 
-  // Destruir y recrear #reader limpio
-  const viewport = document.querySelector('.scanner-viewport');
-  document.getElementById('reader')?.remove();
-  document.querySelector('.scanner-viewport select')?.remove();
-  const nuevoReader = document.createElement('div');
-  nuevoReader.id = 'reader';
-  viewport.insertBefore(nuevoReader, viewport.firstChild);
+        if (camaras.length > 1) {
+          const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
+          camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
 
-  // Mostrar overlay DESPUÉS de limpiar
-  document.getElementById('scannerOverlay').classList.remove('hidden');
+          const selector = document.createElement('select');
+          selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
+          camaras.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.label || `Cámara ${c.id}`;
+            if (c.id === camaraId) opt.selected = true;
+            selector.appendChild(opt);
+          });
+          selector.addEventListener('change', async () => {
+            await scanner.stop();
+            await scanner.start(selector.value, config,
+              d => { if (!escaneado) exitoScanner(d); }, () => {});
+          });
+          document.querySelector('.scanner-viewport').appendChild(selector);
+        } else {
+          camaraId = camaras[0]?.id || { facingMode: 'environment' };
+        }
 
-  const config = {
-    fps: 15,
-    qrbox: { width: 280, height: 110 },
-    formatsToSupport: [
-      Html5QrcodeSupportedFormats.EAN_13,
-      Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.CODE_128,
-      Html5QrcodeSupportedFormats.CODE_39,
-      Html5QrcodeSupportedFormats.UPC_A,
-      Html5QrcodeSupportedFormats.UPC_E,
-    ]
-  };
+        await scanner.start(camaraId, config,
+          decoded => { if (!escaneado) exitoScanner(decoded); },
+          () => {}
+        );
 
-  try {
-    scanner = new Html5Qrcode('reader');
-    const camaras = await Html5Qrcode.getCameras();
+        document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
 
-    let camaraId;
-    if (camaras.length > 1) {
-      const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
-      camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
-
-      const selector = document.createElement('select');
-      selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
-      camaras.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.label || `Cámara ${c.id}`;
-        if (c.id === camaraId) opt.selected = true;
-        selector.appendChild(opt);
-      });
-      selector.addEventListener('change', async () => {
-        if (!scanner) return;
-        try { await scanner.stop(); } catch(e) {}
-        const vp = document.querySelector('.scanner-viewport');
-        document.getElementById('reader')?.remove();
-        const nr = document.createElement('div');
-        nr.id = 'reader';
-        vp.insertBefore(nr, vp.firstChild);
-        scanner = new Html5Qrcode('reader');
-        await scanner.start(selector.value, config,
-          d => { if (!escaneado) exitoScanner(d); }, () => {});
-      });
-      viewport.appendChild(selector);
-    } else {
-      camaraId = camaras[0]?.id || { facingMode: 'environment' };
+      } catch(err) {
+        document.getElementById('scannerStatusText').innerHTML =
+          '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
+      }
     }
 
-    await scanner.start(camaraId, config,
-      decoded => { if (!escaneado) exitoScanner(decoded); },
-      () => {}
-    );
+    function exitoScanner(codigo) {
+      escaneado = true;
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+      const bar = document.getElementById('scannerStatus');
+      bar.className = 'scanner-status success';
+      bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
+      setTimeout(() => {
+        cerrarScanner();
+        input.value = codigo;
+        buscar();
+      }, 900);
+    }
 
-    document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
+    function cerrarScanner() {
+      if (scanner) {
+        scanner.stop().catch(() => {}).finally(() => { scanner = null; });
+      }
+      document.querySelector('.scanner-viewport select')?.remove();
+      document.getElementById('scannerOverlay').classList.add('hidden');
+      document.getElementById('scannerManualInput').value = '';
+      escaneado = false;
+    }
 
-  } catch(err) {
-    scannerAbierto = false;
-    document.getElementById('scannerStatusText').innerHTML =
-      '<strong style="color:#fca5a5">Sin acceso a cámara</strong> · Usa el campo de abajo';
-  }
-}
+    function confirmarManualScanner() {
+      const val = document.getElementById('scannerManualInput').value.trim();
+      if (val) exitoScanner(val);
+    }
 
-function exitoScanner(codigo) {
-  if (escaneado) return; // evita doble disparo
-  escaneado = true;
-  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-  const bar = document.getElementById('scannerStatus');
-  bar.className = 'scanner-status success';
-  bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
+    document.getElementById('scannerManualInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmarManualScanner();
+    });
 
-  // Cerrar y buscar con pequeño delay para mostrar el feedback
-  setTimeout(async () => {
-    await cerrarScanner();
-    input.value = codigo;
-    buscar();
-  }, 800);
-}
-
-async function cerrarScanner() {
-  // Parar scanner primero
-  if (scanner) {
-    try { await scanner.stop(); } catch(e) {}
-    scanner = null;
-  }
-  // Limpiar DOM
-  document.getElementById('reader')?.remove();
-  document.querySelector('.scanner-viewport select')?.remove();
-  // Ocultar overlay
-  document.getElementById('scannerOverlay').classList.add('hidden');
-  // Reset estado
-  document.getElementById('scannerManualInput').value = '';
-  document.getElementById('scannerStatus').className = 'scanner-status';
-  document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
-  escaneado = false;
-  scannerAbierto = false;
-}
-
-function confirmarManualScanner() {
-  const val = document.getElementById('scannerManualInput').value.trim();
-  if (val) exitoScanner(val);
-}
-
-document.getElementById('scannerManualInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') confirmarManualScanner();
-});
+    function esc(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
   </script>
 </body>
 </html>
