@@ -527,7 +527,7 @@
 
   // Inicia la carga en segundo plano apenas carga la página
   function cargarCache() {
-    setCachePill('loading', 'Cargando…');
+    setCachePill();
 
     // Pedimos todos los datos de Base de Datos al backend
     // (agregamos action=prefetch que devuelve array completo)
@@ -536,10 +536,10 @@
         Cache.bd   = data;                           // [{sku, desc, cod}]
         Cache.skus = [...new Set(data.map(r => r.sku).filter(Boolean))];
         Cache.listo = true;
-        setCachePill('ready', Cache.bd.length.toLocaleString('es-CL') + ' prods.');
+        setCachePill('ready', Cache.bd.length.toLocaleString;
       } else {
         Cache.error = true;
-        setCachePill('error', 'Sin caché');
+        setCachePill();
         // No rompemos la app: las búsquedas caen al backend normal
       }
     });
