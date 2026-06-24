@@ -502,74 +502,7 @@
   // ═══════════════════════════════════════════════
   const API = 'https://script.google.com/macros/s/AKfycbzKBa24qpv5CSVtu2hF_34HFg9AiQ_zGi8rf5Ph3nUW-58dS2fW_tCNdiZbrPRaAqdXAQ/exec';
 
-  // ═══════════════════════════════════════════════
-  //  CACHÉ LOCAL — prefetch de Base de Datos
-  //  Se carga UNA vez al abrir la app, luego la
-  //  búsqueda por descripción y código madre es
-  //  instantánea sin más llamadas al backend.
-  // ═══════════════════════════════════════════════
-  const Cache = {
-    bd: [],          // [{sku, desc, cod}]
-    skus: [],        // [sku, sku, …] para sugerencias numéricas
-    listo: false,
-    error: false,
-  };
-
-  const cachePill  = document.getElementById('cachePill');
-  const cacheDot   = document.getElementById('cacheDot');
-  const cacheLabel = document.getElementById('cacheLabel');
-
-  function setCachePill(estado, texto) {
-    cachePill.className = 'cache-pill ' + estado;
-    cacheLabel.textContent = texto;
-    cacheDot.className = 'cache-dot' + (estado === 'loading' ? ' pulsing' : '');
-  }
-
-  // Inicia la carga en segundo plano apenas carga la página
-  function cargarCache() {
-    setCachePill('loading', 'Cargando…');
-
-    // Pedimos todos los datos de Base de Datos al backend
-    // (agregamos action=prefetch que devuelve array completo)
-    jsonp(API + '?action=prefetch', data => {
-      if (data && Array.isArray(data) && data.length > 0) {
-        Cache.bd   = data;                           // [{sku, desc, cod}]
-        Cache.skus = [...new Set(data.map(r => r.sku).filter(Boolean))];
-        Cache.listo = true;
-        setCachePill('ready', Cache.bd.length.toLocaleString('es-CL') + ' prods.');
-      } else {
-        Cache.error = true;
-        setCachePill('error', 'Sin caché');
-        // No rompemos la app: las búsquedas caen al backend normal
-      }
-    });
-  }
-
-  // ── Búsqueda local en caché (instantánea) ──
-  function buscarEnCacheDescripcion(texto) {
-    const q = texto.trim().toUpperCase();
-    const res = [];
-    for (const r of Cache.bd) {
-      if ((r.desc || '').toUpperCase().includes(q)) {
-        res.push(r);
-        if (res.length >= 8) break;
-      }
-    }
-    return res;
-  }
-
-  function buscarEnCacheCodigoMadre(codigo) {
-    const q = codigo.trim().toUpperCase();
-    const res = [];
-    for (const r of Cache.bd) {
-      if ((r.cod || '').toUpperCase() === q) {
-        res.push(r);
-        if (res.length >= 50) break;
-      }
-    }
-    return res;
-  }
-
+  
   function sugerirEnCacheSku(prefijo) {
     const res = [];
     const seen = new Set();
