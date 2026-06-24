@@ -714,17 +714,22 @@
 
     // ── SCANNER ──
 // ── SCANNER ──
+// ── SCANNER ──
 async function abrirScanner() {
-  // 1. Limpiar residuos de sesión anterior
-  const readerEl = document.getElementById('reader');
-  readerEl.innerHTML = '';
+  // Destruir y recrear el div #reader completamente
+  const viewport = document.querySelector('.scanner-viewport');
+  const viejoReader = document.getElementById('reader');
+  if (viejoReader) viejoReader.remove();
+  const nuevoReader = document.createElement('div');
+  nuevoReader.id = 'reader';
+  viewport.insertBefore(nuevoReader, viewport.firstChild);
 
   document.getElementById('scannerOverlay').classList.remove('hidden');
   document.getElementById('scannerStatus').className = 'scanner-status';
   document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
   escaneado = false;
+  scanner = null;
 
-  scanner = new Html5Qrcode('reader');
   const config = {
     fps: 15,
     qrbox: { width: 280, height: 110 },
@@ -739,6 +744,7 @@ async function abrirScanner() {
   };
 
   try {
+    scanner = new Html5Qrcode('reader');
     const camaras = await Html5Qrcode.getCameras();
     let camaraId;
 
@@ -760,12 +766,16 @@ async function abrirScanner() {
         if (!scanner) return;
         try {
           await scanner.stop();
-          // 2. Limpiar también al cambiar cámara
-          document.getElementById('reader').innerHTML = '';
-          scanner = new Html5Qrcode('reader');
-          await scanner.start(selector.value, config,
-            d => { if (!escaneado) exitoScanner(d); }, () => {});
-        } catch(e) { console.error('Error al cambiar cámara', e); }
+        } catch(e) {}
+        // Recrear reader también al cambiar cámara
+        const vp = document.querySelector('.scanner-viewport');
+        document.getElementById('reader')?.remove();
+        const nr = document.createElement('div');
+        nr.id = 'reader';
+        vp.insertBefore(nr, vp.firstChild);
+        scanner = new Html5Qrcode('reader');
+        await scanner.start(selector.value, config,
+          d => { if (!escaneado) exitoScanner(d); }, () => {});
       });
 
       document.querySelector('.scanner-viewport').appendChild(selector);
@@ -782,7 +792,7 @@ async function abrirScanner() {
 
   } catch(err) {
     document.getElementById('scannerStatusText').innerHTML =
-      '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
+      '<strong style="color:#fca5a5">Sin acceso a cámara</strong> · Usa el campo de abajo';
   }
 }
 
@@ -800,13 +810,12 @@ function exitoScanner(codigo) {
 }
 
 async function cerrarScanner() {
-  // 3. Esperar que stop() termine ANTES de limpiar el DOM
   if (scanner) {
     try { await scanner.stop(); } catch(e) {}
     scanner = null;
   }
-  // Limpiar el reader para la próxima apertura
-  document.getElementById('reader').innerHTML = '';
+  // Destruir el reader para que la próxima apertura empiece limpio
+  document.getElementById('reader')?.remove();
   document.querySelector('.scanner-viewport select')?.remove();
   document.getElementById('scannerOverlay').classList.add('hidden');
   document.getElementById('scannerManualInput').value = '';
