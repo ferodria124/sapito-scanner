@@ -23,7 +23,6 @@
       --azul-100: #dbeafe;
       --azul-50:  #eff6ff;
       --cian:       #2563eb;
-      --cian-suave: #dbeafe;
       --blanco:   #ffffff;
       --gris-900: #111827;
       --gris-700: #374151;
@@ -55,6 +54,7 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
 
+    /* ── HEADER ── */
     .header {
       background: var(--blanco);
       box-shadow: 0 1px 8px rgba(0,0,0,0.07);
@@ -85,12 +85,14 @@
     .header-title .ver { color: var(--cian); font-size: 22px; }
     .header-loc { font-size: 11px; color: var(--gris-500); margin-top: 3px; font-weight: 500; }
 
+    /* ── MAIN ── */
     .main {
       flex: 1; max-width: 680px; width: 100%;
       margin: 0 auto; padding: 20px 16px 40px;
       display: flex; flex-direction: column; gap: 14px;
     }
 
+    /* ── SEARCH CARD ── */
     .search-card {
       background: var(--blanco);
       border-radius: var(--radio);
@@ -111,15 +113,15 @@
     .input-wrap { flex: 1 1 200px; position: relative; order: 1; }
     .input-icon {
       position: absolute; left: 13px; top: 50%;
-      transform: translateY(-50%); font-size: 15px; pointer-events: none;
-      z-index: 1;
+      transform: translateY(-50%); font-size: 15px; pointer-events: none; z-index: 1;
     }
     .search-input {
       width: 100%; padding: 13px 13px 13px 40px;
       border: 2px solid var(--gris-200); border-radius: 11px;
       font-size: 16px; font-family: var(--font); color: var(--gris-900);
       background: var(--gris-50); outline: none;
-      -webkit-appearance: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      -webkit-appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
     .search-input:focus {
       border-color: var(--azul-400); background: var(--blanco);
@@ -127,15 +129,20 @@
     }
     .search-input::placeholder { color: #9ca3af; }
 
+    /* ── DROPDOWN — scroll táctil real ── */
     .suggestions {
       position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-      background: var(--blanco); border: 1.5px solid var(--azul-400);
-      border-radius: 11px; box-shadow: var(--sombra-lg);
+      background: var(--blanco);
+      border: 1.5px solid var(--azul-400);
+      border-radius: 11px;
+      box-shadow: var(--sombra-lg);
       z-index: 200;
-      max-height: 320px;
-      overflow-y: auto;
+      /* scroll táctil */
+      max-height: 280px;
+      overflow-y: scroll;           /* scroll siempre activo */
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+      touch-action: pan-y;          /* permite deslizar verticalmente */
     }
     .suggestions.hidden { display: none; }
 
@@ -149,27 +156,22 @@
       border-bottom: 1px solid var(--gris-200);
       z-index: 1;
     }
-
     .suggestion-item {
       padding: 12px 14px; cursor: pointer;
       border-bottom: 1px solid var(--gris-100);
-      transition: background 0.1s;
-      min-height: 48px; display: flex; flex-direction: column; justify-content: center;
+      min-height: 52px;
+      display: flex; flex-direction: column; justify-content: center;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      /* sin transition para no bloquear el scroll */
     }
     .suggestion-item:last-child { border-bottom: none; }
-    .suggestion-item:hover, .suggestion-item.active { background: var(--azul-50); }
-    .suggestion-item:active { background: var(--azul-100); }
+    .suggestion-item.active,
+    .suggestion-item:hover { background: var(--azul-50); }
     .sugg-label { font-size: 10px; color: var(--gris-500); font-family: monospace; }
     .sugg-desc  { font-size: 13px; font-weight: 600; color: var(--gris-900); margin-top: 2px; line-height: 1.3; }
-    .sugg-badge {
-      display: inline-block; font-size: 9px; font-weight: 700;
-      padding: 2px 7px; border-radius: 10px; margin-left: 6px;
-      background: var(--azul-100); color: var(--azul-500);
-      vertical-align: middle; letter-spacing: 0.5px;
-    }
 
+    /* ── BOTONES ── */
     .btn-cam {
       order: 2; flex-shrink: 0;
       width: 48px; height: 48px;
@@ -193,6 +195,7 @@
     .btn-consultar:active { transform: scale(0.97); opacity: 0.9; }
     .btn-consultar:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    /* ── RESULTADO ── */
     .resultado {
       background: var(--blanco); border-radius: var(--radio);
       overflow: hidden; box-shadow: var(--sombra);
@@ -204,7 +207,6 @@
       from { opacity: 0; transform: translateY(-8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     .res-header {
       background: linear-gradient(135deg, var(--azul-900), var(--azul-600));
       padding: 16px 20px; display: flex; align-items: center; gap: 12px;
@@ -226,7 +228,6 @@
     }
     .res-body { padding: 18px; }
     .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
     .res-field {
       background: var(--gris-50); border: 1.5px solid var(--gris-200);
       border-radius: 11px; padding: 14px;
@@ -239,7 +240,6 @@
     }
     .res-field.desc-field .res-field-label { color: var(--azul-500); }
     .res-field-value { font-size: 14px; font-weight: 600; color: var(--gris-900); line-height: 1.4; }
-
     .stock-num {
       font-size: 52px; font-weight: 900; line-height: 1;
       letter-spacing: -2px; color: var(--gris-900);
@@ -263,7 +263,7 @@
     .error-title { font-size: 15px; font-weight: 700; color: var(--rojo); }
     .error-msg   { font-size: 13px; color: var(--gris-500); margin-top: 3px; }
 
-    .loading { padding: 40px; text-align: center; color: var(--azul-400); }
+    .loading { padding: 40px; text-align: center; }
     .spinner {
       width: 32px; height: 32px; margin: 0 auto 12px;
       border: 3px solid var(--azul-100); border-top-color: var(--azul-500);
@@ -350,19 +350,6 @@
     .scanner-status.success { background: linear-gradient(135deg, #064e3b, var(--verde)); }
     .scan-status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
     .scan-status-text strong { color: var(--blanco); display: block; font-size: 15px; }
-
-    /* Botón escanear de nuevo */
-    .btn-scan-again {
-      display: none;
-      padding: 10px 20px;
-      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3);
-      color: var(--blanco); border-radius: 20px;
-      font-size: 14px; font-weight: 700; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: all 0.15s;
-    }
-    .btn-scan-again:active { background: rgba(255,255,255,0.25); transform: scale(0.97); }
-
     .scanner-manual {
       background: #0d1117; padding: 10px 14px;
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
@@ -375,7 +362,7 @@
       border-radius: 9px; color: var(--blanco); font-size: 16px;
       font-family: monospace; outline: none; -webkit-appearance: none;
     }
-    .scan-manual-input:focus { border-color: var(--cian); box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    .scan-manual-input:focus { border-color: var(--cian); }
     .scan-manual-input::placeholder { color: #484f58; }
     .btn-scan-ok {
       padding: 11px 16px; background: var(--azul-500);
@@ -385,24 +372,25 @@
     }
     .btn-scan-ok:active { opacity: 0.85; }
 
+    /* ── Responsive ── */
     @media (max-width: 480px) {
       .header-title { font-size: 18px; }
       .header-title .ver { font-size: 20px; }
       .main { padding: 14px 12px 32px; gap: 12px; }
       .search-card { padding: 16px; }
-      .search-row { flex-wrap: wrap; }
       .input-wrap { flex: 1 1 100%; order: 1; }
       .btn-cam { order: 2; }
       .btn-consultar { order: 3; flex: 1; }
       .res-grid { grid-template-columns: 1fr; }
       .res-field.span2 { grid-column: 1; }
       .stock-num { font-size: 44px; }
-      .suggestions { max-height: 260px; }
+      .suggestions { max-height: 220px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- HEADER: sin pill de caché, limpio -->
   <header class="header">
     <div class="header-inner">
       <div class="logo-wrap">
@@ -413,17 +401,14 @@
         />
       </div>
       <div class="header-text">
-       <div class="header-eyebrow">Sistema de Inventario</div>
-       <div class="header-title">Control Sapito <span class="ver">3.0</span></div>
-       <div class="header-loc">📍 Algarrobo</div>
-       <div class="cache-pill" id="cachePill" style="margin-top:6px; display:inline-flex;">
-         <div class="cache-dot pulsing" id="cacheDot"></div>
-         <span id="cacheLabel">…</span>
-       </div>
+        <div class="header-eyebrow">Sistema de Inventario</div>
+        <div class="header-title">Control Sapito <span class="ver">3.0</span></div>
+        <div class="header-loc">📍 Algarrobo</div>
       </div>
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="main">
     <div class="search-card">
       <div class="search-eyebrow">Consultar stock</div>
@@ -454,7 +439,7 @@
     Control Sapito 3.0 &nbsp;·&nbsp; CasaIdeas Algarrobo
   </footer>
 
-  <!-- SCANNER POPUP -->
+  <!-- SCANNER -->
   <div id="scannerOverlay" class="scanner-overlay hidden">
     <div class="scanner-header">
       <div>
@@ -483,7 +468,6 @@
     <div class="scanner-status" id="scannerStatus">
       <span>🔍</span>
       <span class="scan-status-text" id="scannerStatusText">Buscando código de barras…</span>
-      <button class="btn-scan-again" id="btnScanAgain" onclick="reiniciarScanner()">📷 Escanear otro</button>
     </div>
     <div class="scanner-manual">
       <input type="number" inputmode="numeric" class="scan-manual-input"
@@ -494,18 +478,74 @@
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
+  'use strict';
+
   // ═══════════════════════════════════════════════
   //  CONFIG
   // ═══════════════════════════════════════════════
   const API = 'https://script.google.com/macros/s/AKfycbzKBa24qpv5CSVtu2hF_34HFg9AiQ_zGi8rf5Ph3nUW-58dS2fW_tCNdiZbrPRaAqdXAQ/exec';
 
-  function sugerirEnCacheSku(prefijo) {
+  // ═══════════════════════════════════════════════
+  //  CACHÉ LOCAL — invisible para el usuario
+  //  Se carga en segundo plano al arrancar.
+  //  Mientras no está lista, cae al backend.
+  // ═══════════════════════════════════════════════
+  const Cache = {
+    listo: false,
+    items: [],      // [{ sku, desc, cod }]  — toda la Base de Datos
+    skuSet: new Set() // para lookup rápido en buscar()
+  };
+
+  function cargarCache() {
+    // Carga silenciosa en segundo plano
+    jsonp(API + '?action=prefetch', datos => {
+      if (!datos || !Array.isArray(datos) || datos.length === 0) return;
+      Cache.items = datos;
+      Cache.skuSet.clear();
+      for (const d of datos) {
+        if (d.sku) Cache.skuSet.add(d.sku.toString().trim());
+      }
+      Cache.listo = true;
+    });
+  }
+
+  // ── Búsqueda por prefijo de SKU ──
+  function cacheSugerirSku(prefijo) {
+    const pre = prefijo.trim();
     const res = [];
     const seen = new Set();
-    for (const s of Cache.skus) {
-      if (s.startsWith(prefijo) && !seen.has(s)) {
-        seen.add(s); res.push(s);
+    for (const it of Cache.items) {
+      const s = it.sku || '';
+      if (s.startsWith(pre) && !seen.has(s)) {
+        seen.add(s);
+        res.push({ sku: s, desc: it.desc || '' });
         if (res.length >= 8) break;
+      }
+    }
+    return res;
+  }
+
+  // ── Búsqueda por descripción ──
+  function cacheBuscarDesc(texto) {
+    const t = texto.trim().toUpperCase();
+    const res = [];
+    for (const it of Cache.items) {
+      if ((it.desc || '').toUpperCase().includes(t)) {
+        res.push({ sku: it.sku, desc: it.desc });
+        if (res.length >= 8) break;
+      }
+    }
+    return res;
+  }
+
+  // ── Búsqueda por código madre ──
+  function cacheBuscarMadre(codigo) {
+    const cod = codigo.trim().toUpperCase();
+    const res = [];
+    for (const it of Cache.items) {
+      if ((it.cod || '').toUpperCase() === cod) {
+        res.push({ sku: it.sku, desc: it.desc, cod: it.cod });
+        if (res.length >= 50) break;
       }
     }
     return res;
@@ -515,51 +555,65 @@
   //  JSONP
   // ═══════════════════════════════════════════════
   function jsonp(url, callback) {
-    const fn = '_cb' + Date.now();
-    document.getElementById('_jsonp')?.remove();
+    const fn = '_cb' + Date.now() + Math.random().toString(36).slice(2);
+    const old = document.getElementById('_jsonp_tag');
+    if (old) old.remove();
     window[fn] = data => {
       try { delete window[fn]; } catch(e) {}
-      document.getElementById('_jsonp')?.remove();
+      document.getElementById('_jsonp_tag')?.remove();
       callback(data);
     };
     const s = document.createElement('script');
-    s.id = '_jsonp';
+    s.id  = '_jsonp_tag';
     s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + fn;
-    s.onerror = () => { try { delete window[fn]; } catch(e) {} s.remove(); callback(null); };
+    s.onerror = () => {
+      try { delete window[fn]; } catch(e) {}
+      s.remove();
+      callback(null);
+    };
     document.head.appendChild(s);
   }
 
   // ═══════════════════════════════════════════════
-  //  ELEMENTOS DOM
+  //  DOM
   // ═══════════════════════════════════════════════
-  const input       = document.getElementById('skuInput');
-  const suggestions = document.getElementById('suggestions');
-  const resultado   = document.getElementById('resultado');
-  const estadoVacio = document.getElementById('estadoVacio');
+  const inputEl     = document.getElementById('skuInput');
+  const suggestEl   = document.getElementById('suggestions');
+  const resultadoEl = document.getElementById('resultado');
+  const vacioEl     = document.getElementById('estadoVacio');
 
   let sugerenciaActiva = -1;
-  let timeoutSugerencias;
+  let timeoutSugg;
 
   // ═══════════════════════════════════════════════
-  //  DROPDOWN
+  //  DROPDOWN — CONTROL CIERRE/APERTURA
+  //  Truco: en móvil, touchstart en el dropdown
+  //  evita que el blur del input lo cierre antes
+  //  de procesar el toque.
   // ═══════════════════════════════════════════════
-  let dropdownTouching = false;
+  let tocandoDropdown = false;
 
-  suggestions.addEventListener('touchstart', () => { dropdownTouching = true; }, { passive: true });
-  suggestions.addEventListener('touchend',   () => { dropdownTouching = false; }, { passive: true });
+  suggestEl.addEventListener('touchstart', () => { tocandoDropdown = true; }, { passive: true });
+  suggestEl.addEventListener('touchend',   () => { tocandoDropdown = false; }, { passive: true });
+  suggestEl.addEventListener('touchcancel',() => { tocandoDropdown = false; }, { passive: true });
 
-  input.addEventListener('blur', () => {
+  inputEl.addEventListener('blur', () => {
+    // Pequeña espera para que el touchend del item se procese primero
     setTimeout(() => {
-      if (!dropdownTouching) cerrarSugerencias();
-    }, 150);
+      if (!tocandoDropdown) cerrarSugerencias();
+    }, 200);
   });
 
-  document.addEventListener('click', e => {
+  // Clic fuera en desktop
+  document.addEventListener('mousedown', e => {
     if (!e.target.closest('.input-wrap')) cerrarSugerencias();
   });
 
-  input.addEventListener('keydown', e => {
-    const items = suggestions.querySelectorAll('.suggestion-item');
+  // ═══════════════════════════════════════════════
+  //  TECLADO
+  // ═══════════════════════════════════════════════
+  inputEl.addEventListener('keydown', e => {
+    const items = suggestEl.querySelectorAll('.suggestion-item');
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       sugerenciaActiva = Math.min(sugerenciaActiva + 1, items.length - 1);
@@ -571,51 +625,56 @@
       items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
       items[sugerenciaActiva]?.scrollIntoView({ block: 'nearest' });
     } else if (e.key === 'Enter') {
-      const active = items[sugerenciaActiva];
-      if (active) { input.value = active.dataset.sku; cerrarSugerencias(); }
+      const activo = items[sugerenciaActiva];
+      if (activo) { inputEl.value = activo.dataset.sku; cerrarSugerencias(); }
       buscar();
     } else if (e.key === 'Escape') {
       cerrarSugerencias();
     }
   });
 
-  input.addEventListener('input', function() {
-    clearTimeout(timeoutSugerencias);
+  // ═══════════════════════════════════════════════
+  //  AUTOCOMPLETAR
+  //  Prioridad: caché local (0 ms) → backend (300 ms delay)
+  // ═══════════════════════════════════════════════
+  inputEl.addEventListener('input', function() {
+    clearTimeout(timeoutSugg);
     const val = this.value.trim();
     if (val.length < 2) { cerrarSugerencias(); return; }
 
+    // ── Ruta rápida: caché local disponible ──
     if (Cache.listo) {
       const esNum = /^\d+$/.test(val);
       if (esNum && val.length >= 5) {
-        const porMadre = buscarEnCacheCodigoMadre(val);
+        // Intentar primero como código madre
+        const porMadre = cacheBuscarMadre(val);
         if (porMadre.length > 0) {
-          mostrarSugerenciasDesc(porMadre, true);
-        } else {
-          const porSku = sugerirEnCacheSku(val).map(s => ({ sku: s, desc: '' }));
-          porSku.length ? mostrarSugerencias(porSku) : cerrarSugerencias();
+          mostrarSugerenciasDesc(porMadre, true); return;
         }
-      } else if (esNum) {
-        const porSku = sugerirEnCacheSku(val).map(s => ({ sku: s, desc: '' }));
-        porSku.length ? mostrarSugerencias(porSku) : cerrarSugerencias();
+      }
+      if (esNum) {
+        const porSku = cacheSugerirSku(val);
+        porSku.length ? mostrarSugerenciasSimple(porSku) : cerrarSugerencias();
       } else {
-        const porDesc = buscarEnCacheDescripcion(val);
+        const porDesc = cacheBuscarDesc(val);
         porDesc.length ? mostrarSugerenciasDesc(porDesc, false) : cerrarSugerencias();
       }
-      return;
+      return; // nunca va al backend para sugerencias
     }
 
-    timeoutSugerencias = setTimeout(() => {
+    // ── Ruta lenta: caché aún no listo, usa backend ──
+    timeoutSugg = setTimeout(() => {
       const esNum = /^\d+$/.test(val);
       if (esNum && val.length >= 5) {
         jsonp(API + '?action=codigoMadre&codigo=' + encodeURIComponent(val), lista => {
-          if (lista && lista.length > 0) mostrarSugerenciasDesc(lista, true);
-          else jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
-            skus => skus ? mostrarSugerencias(skus.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+          if (lista && lista.length > 0) { mostrarSugerenciasDesc(lista, true); return; }
+          jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+            skus => skus ? mostrarSugerenciasSimple(skus.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
           );
         });
       } else if (esNum) {
         jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
-          lista => lista ? mostrarSugerencias(lista.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+          lista => lista ? mostrarSugerenciasSimple(lista.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
         );
       } else {
         jsonp(API + '?action=descripcion&texto=' + encodeURIComponent(val),
@@ -628,69 +687,95 @@
   // ═══════════════════════════════════════════════
   //  RENDER SUGERENCIAS
   // ═══════════════════════════════════════════════
-  function mostrarSugerencias(lista) {
+  function mostrarSugerenciasSimple(lista) {
     if (!lista || !lista.length) { cerrarSugerencias(); return; }
     sugerenciaActiva = -1;
-    suggestions.innerHTML = lista.map(s =>
-      `<div class="suggestion-item" data-sku="${esc(s.sku)}" onmousedown="elegirSugerencia('${esc(s.sku)}')">
-        <span class="sugg-desc">${esc(s.sku)}</span>
-      </div>`
+    suggestEl.innerHTML = lista.map(s =>
+      `<div class="suggestion-item" data-sku="${esc(s.sku)}">
+         <span class="sugg-desc">${esc(s.sku)}</span>
+         ${s.desc ? `<span class="sugg-label">${esc(s.desc)}</span>` : ''}
+       </div>`
     ).join('');
-    suggestions.classList.remove('hidden');
+    _bindItemsToque();
+    suggestEl.classList.remove('hidden');
   }
 
   function mostrarSugerenciasDesc(lista, esMadre) {
     if (!lista || !lista.length) { cerrarSugerencias(); return; }
     sugerenciaActiva = -1;
     const header = esMadre
-      ? `<div class="sugg-header-sticky">📦 ${lista.length} variante${lista.length>1?'s':''} encontrada${lista.length>1?'s':''}</div>`
+      ? `<div class="sugg-header-sticky">📦 ${lista.length} variante${lista.length > 1 ? 's' : ''} encontrada${lista.length > 1 ? 's' : ''}</div>`
       : '';
-    suggestions.innerHTML = header + lista.map(s =>
-      `<div class="suggestion-item" data-sku="${esc(s.sku)}" onmousedown="elegirSugerencia('${esc(s.sku)}')">
-        <span class="sugg-label">${esc(s.sku)}</span>
-        <span class="sugg-desc">${esc(s.desc)}</span>
-      </div>`
+    suggestEl.innerHTML = header + lista.map(s =>
+      `<div class="suggestion-item" data-sku="${esc(s.sku)}">
+         <span class="sugg-label">${esc(s.sku)}</span>
+         <span class="sugg-desc">${esc(s.desc)}</span>
+       </div>`
     ).join('');
-    suggestions.classList.remove('hidden');
+    _bindItemsToque();
+    suggestEl.classList.remove('hidden');
   }
 
-  suggestions.addEventListener('touchstart', e => {
-    const item = e.target.closest('.suggestion-item');
-    if (item) {
-      e.preventDefault();
-      elegirSugerencia(item.dataset.sku);
-    }
-  }, { passive: false });
+  // Vincula toque en cada ítem de forma que no interfiera con el scroll
+  function _bindItemsToque() {
+    let startY = 0;
+    let scrolling = false;
+
+    suggestEl.addEventListener('touchstart', e => {
+      startY = e.touches[0].clientY;
+      scrolling = false;
+    }, { passive: true, once: false });
+
+    suggestEl.addEventListener('touchmove', e => {
+      if (Math.abs(e.touches[0].clientY - startY) > 5) scrolling = true;
+    }, { passive: true });
+
+    suggestEl.querySelectorAll('.suggestion-item').forEach(item => {
+      // mousedown para desktop
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        elegirSugerencia(item.dataset.sku);
+      });
+      // touchend para móvil — solo si no fue scroll
+      item.addEventListener('touchend', e => {
+        if (!scrolling) {
+          e.preventDefault();
+          elegirSugerencia(item.dataset.sku);
+        }
+      }, { passive: false });
+    });
+  }
 
   function elegirSugerencia(sku) {
-    input.value = sku;
+    inputEl.value = sku;
     cerrarSugerencias();
     buscar();
   }
 
   function cerrarSugerencias() {
-    suggestions.classList.add('hidden');
-    suggestions.innerHTML = '';
+    suggestEl.classList.add('hidden');
+    suggestEl.innerHTML = '';
     sugerenciaActiva = -1;
   }
 
   // ═══════════════════════════════════════════════
-  //  BUSCAR
+  //  BUSCAR — siempre al backend (stock en tiempo real)
   // ═══════════════════════════════════════════════
   function buscar() {
-    const sku = input.value.trim();
-    if (!sku) { input.focus(); return; }
+    const sku = inputEl.value.trim();
+    if (!sku) { inputEl.focus(); return; }
     cerrarSugerencias();
     mostrarLoading();
     jsonp(API + '?action=buscar&sku=' + encodeURIComponent(sku), data => {
-      data ? mostrarResultado(data) : mostrarErrorConexion({ message: 'Sin respuesta del servidor.' });
+      if (data) mostrarResultado(data);
+      else mostrarError({ message: 'Sin respuesta del servidor.' });
     });
   }
 
   function mostrarLoading() {
-    estadoVacio.style.display = 'none';
-    resultado.classList.remove('hidden');
-    resultado.innerHTML = `<div class="loading"><div class="spinner"></div><p>Consultando bodega…</p></div>`;
+    vacioEl.style.display = 'none';
+    resultadoEl.classList.remove('hidden');
+    resultadoEl.innerHTML = `<div class="loading"><div class="spinner"></div><p>Consultando bodega…</p></div>`;
   }
 
   function mostrarResultado(data) {
@@ -702,7 +787,7 @@
         ? `<span class="stock-badge badge-low">Stock bajo</span>`
         : `<span class="stock-badge badge-ok">Disponible</span>`;
 
-      resultado.innerHTML = `
+      resultadoEl.innerHTML = `
         <div class="res-header">
           <div class="res-icon">📦</div>
           <div>
@@ -713,7 +798,7 @@
         <div class="res-body">
           <div class="res-grid">
             <div class="res-field desc-field span2">
-              <div class="res-field-label">Descripción SKU</div>
+              <div class="res-field-label">Descripción</div>
               <div class="res-field-value">${esc(data.desc) || '<em style="color:#9ca3af">Sin descripción</em>'}</div>
             </div>
             <div class="res-field">
@@ -723,13 +808,13 @@
               ${badge}
             </div>
             <div class="res-field">
-              <div class="res-field-label">SKU Consultado</div>
+              <div class="res-field-label">SKU</div>
               <div class="res-field-value" style="font-family:monospace;font-size:15px;word-break:break-all">${esc(String(data.sku))}</div>
             </div>
           </div>
         </div>`;
     } else {
-      resultado.innerHTML = `
+      resultadoEl.innerHTML = `
         <div class="res-error">
           <div class="error-icon">🔎</div>
           <div>
@@ -738,11 +823,11 @@
           </div>
         </div>`;
     }
-    resultado.classList.remove('hidden');
+    resultadoEl.classList.remove('hidden');
   }
 
-  function mostrarErrorConexion(err) {
-    resultado.innerHTML = `
+  function mostrarError(err) {
+    resultadoEl.innerHTML = `
       <div class="res-error">
         <div class="error-icon">⚠️</div>
         <div>
@@ -753,153 +838,100 @@
   }
 
   // ═══════════════════════════════════════════════
-  //  SCANNER — CORRECCIÓN PRINCIPAL
-  //  Problema: escaneado=true quedaba pegado y el
-  //  scanner nunca se reiniciaba entre lecturas.
+  //  SCANNER
   // ═══════════════════════════════════════════════
   let scanner      = null;
   let escaneado    = false;
   let camaraActual = null;
-  let configScanner = null;
 
   async function abrirScanner() {
-    // Resetear estado completamente antes de abrir
     escaneado = false;
     document.getElementById('scannerOverlay').classList.remove('hidden');
-    _resetearUIScanner();
+    _resetUIScanner();
     await _iniciarCamara();
   }
 
-  function _resetearUIScanner() {
+  function _resetUIScanner() {
     const bar = document.getElementById('scannerStatus');
     bar.className = 'scanner-status';
-    bar.innerHTML = `
-      <span>🔍</span>
-      <span class="scan-status-text" id="scannerStatusText">Iniciando cámara…</span>
-      <button class="btn-scan-again hidden" id="btnScanAgain" onclick="reiniciarScanner()">📷 Escanear otro</button>
-    `;
+    bar.innerHTML = `<span>🔍</span><span class="scan-status-text" id="scannerStatusText">Iniciando cámara…</span>`;
     document.getElementById('scannerManualInput').value = '';
   }
 
   async function _iniciarCamara() {
-    // Si ya hay un scanner activo, detenerlo limpiamente primero
     if (scanner) {
       try { await scanner.stop(); } catch(e) {}
       scanner = null;
     }
-
-    // Limpiar el contenedor del reader para evitar pantalla negra
-    const readerEl = document.getElementById('reader');
-    readerEl.innerHTML = '';
-
+    document.getElementById('reader').innerHTML = '';
     escaneado = false;
 
-    configScanner = {
+    const config = {
       fps: 15,
       qrbox: { width: 280, height: 110 },
       formatsToSupport: [
-        Html5QrcodeSupportedFormats.EAN_13,
-        Html5QrcodeSupportedFormats.EAN_8,
-        Html5QrcodeSupportedFormats.CODE_128,
-        Html5QrcodeSupportedFormats.CODE_39,
-        Html5QrcodeSupportedFormats.UPC_A,
-        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.UPC_A,  Html5QrcodeSupportedFormats.UPC_E,
       ]
     };
 
     scanner = new Html5Qrcode('reader');
-
     try {
       const camaras = await Html5Qrcode.getCameras();
-
       if (camaras.length > 1) {
         const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
-        camaraActual = (trasera ? trasera.id : camaras[camaras.length - 1].id);
+        camaraActual = trasera ? trasera.id : camaras[camaras.length - 1].id;
 
-        // Selector de cámara (solo si no existe ya)
         if (!document.querySelector('.scanner-viewport select')) {
-          const selector = document.createElement('select');
-          selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
+          const sel = document.createElement('select');
+          sel.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
           camaras.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id; opt.textContent = c.label || `Cámara ${c.id}`;
             if (c.id === camaraActual) opt.selected = true;
-            selector.appendChild(opt);
+            sel.appendChild(opt);
           });
-          selector.addEventListener('change', async () => {
-            camaraActual = selector.value;
-            await _iniciarCamara();
-          });
-          document.querySelector('.scanner-viewport').appendChild(selector);
+          sel.addEventListener('change', async () => { camaraActual = sel.value; await _iniciarCamara(); });
+          document.querySelector('.scanner-viewport').appendChild(sel);
         }
       } else {
         camaraActual = camaras[0]?.id || { facingMode: 'environment' };
       }
 
-      await scanner.start(
-        camaraActual,
-        configScanner,
+      await scanner.start(camaraActual, config,
         decoded => { if (!escaneado) exitoScanner(decoded); },
         () => {}
       );
-
-      const statusText = document.getElementById('scannerStatusText');
-      if (statusText) statusText.textContent = 'Buscando código de barras…';
-
+      const st = document.getElementById('scannerStatusText');
+      if (st) st.textContent = 'Buscando código de barras…';
     } catch(err) {
       const bar = document.getElementById('scannerStatus');
-      if (bar) bar.innerHTML = `
-        <span>⚠️</span>
-        <span class="scan-status-text">
-          <strong style="color:#fca5a5">Sin acceso a cámara</strong>
-          Usa el campo de abajo
-        </span>`;
+      bar.innerHTML = `<span>⚠️</span><span class="scan-status-text"><strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo</span>`;
     }
   }
 
   function exitoScanner(codigo) {
-    // Marcar como escaneado para ignorar lecturas duplicadas del mismo frame
     escaneado = true;
     if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-
     const bar = document.getElementById('scannerStatus');
     bar.className = 'scanner-status success';
-    bar.innerHTML = `
-      <span>✅</span>
-      <span class="scan-status-text">
-        <strong>${esc(codigo)}</strong>
-        ¡Escaneado! Cerrando…
-      </span>
-    `;
-
-    // Cerrar, rellenar input y buscar
+    bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
     setTimeout(async () => {
       await _detenerCamara();
       document.getElementById('scannerOverlay').classList.add('hidden');
-      input.value = codigo;
+      inputEl.value = codigo;
       buscar();
     }, 900);
   }
 
-  // Reiniciar scanner sin cerrar el overlay (para escanear otro)
-  async function reiniciarScanner() {
-    escaneado = false;
-    _resetearUIScanner();
-    await _iniciarCamara();
-  }
-
   async function _detenerCamara() {
-    if (scanner) {
-      try { await scanner.stop(); } catch(e) {}
-      scanner = null;
-    }
-    // Limpiar reader para evitar pantalla negra en próxima apertura
+    if (scanner) { try { await scanner.stop(); } catch(e) {} scanner = null; }
     document.getElementById('reader').innerHTML = '';
   }
 
   async function cerrarScanner() {
     await _detenerCamara();
-    // Remover selector de cámara si existe
     document.querySelector('.scanner-viewport select')?.remove();
     document.getElementById('scannerOverlay').classList.add('hidden');
     document.getElementById('scannerManualInput').value = '';
@@ -910,7 +942,6 @@
     const val = document.getElementById('scannerManualInput').value.trim();
     if (val) exitoScanner(val);
   }
-
   document.getElementById('scannerManualInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') confirmarManualScanner();
   });
@@ -922,6 +953,7 @@
     return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ── Arranque: carga caché silenciosa en background ──
   cargarCache();
   </script>
 </body>
