@@ -554,25 +554,53 @@
   // ═══════════════════════════════════════════════
   //  JSONP
   // ═══════════════════════════════════════════════
-  function jsonp(url, callback) {
-    const fn = '_cb' + Date.now() + Math.random().toString(36).slice(2);
-    const old = document.getElementById('_jsonp_tag');
-    if (old) old.remove();
-    window[fn] = data => {
-      try { delete window[fn]; } catch(e) {}
-      document.getElementById('_jsonp_tag')?.remove();
-      callback(data);
-    };
-    const s = document.createElement('script');
-    s.id  = '_jsonp_tag';
-    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + fn;
-    s.onerror = () => {
-      try { delete window[fn]; } catch(e) {}
-      s.remove();
+ function jsonp(url, callback, intento = 1) {
+  const fn  = '_cb' + Date.now();
+  const id  = '_jsonp_' + fn;
+  document.getElementById('_jsonp')?.remove();
+
+  let respondido = false;
+
+  // Timeout de 8 segundos — si no responde, reintenta
+  const timer = setTimeout(() => {
+    if (respondido) return;
+    respondido = true;
+    try { delete window[fn]; } catch(e) {}
+    document.getElementById(id)?.remove();
+    if (intento < 3) {
+      // Reintento automático
+      jsonp(url, callback, intento + 1);
+    } else {
       callback(null);
-    };
-    document.head.appendChild(s);
-  }
+    }
+  }, 8000);
+
+  window[fn] = data => {
+    if (respondido) return;
+    respondido = true;
+    clearTimeout(timer);
+    try { delete window[fn]; } catch(e) {}
+    document.getElementById(id)?.remove();
+    callback(data);
+  };
+
+  const s = document.createElement('script');
+  s.id  = id;
+  s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + fn;
+  s.onerror = () => {
+    if (respondido) return;
+    respondido = true;
+    clearTimeout(timer);
+    try { delete window[fn]; } catch(e) {}
+    s.remove();
+    if (intento < 3) {
+      jsonp(url, callback, intento + 1);
+    } else {
+      callback(null);
+    }
+  };
+  document.head.appendChild(s);
+}
 
   // ═══════════════════════════════════════════════
   //  DOM
@@ -826,16 +854,17 @@
     resultadoEl.classList.remove('hidden');
   }
 
-  function mostrarError(err) {
-    resultadoEl.innerHTML = `
-      <div class="res-error">
-        <div class="error-icon">⚠️</div>
-        <div>
-          <div class="error-title">Error de conexión</div>
-          <div class="error-msg">${esc(err.message || 'No se pudo conectar.')}</div>
-        </div>
-      </div>`;
-  }
+ function mostrarErrorConexion(err) {
+  resultado.innerHTML = `
+    <div class="res-error">
+      <div class="error-icon">⚠️</div>
+      <div>
+        <div class="error-title">Error de conexión</div>
+        <div class="error-msg">${esc(err.message || 'No se pudo conectar. Verifica tu conexión a internet e intenta de nuevo.')}</div>
+        <button onclick="buscar()" style="margin-top:10px;padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">🔄 Reintentar</button>
+      </div>
+    </div>`;
+}
 
   // ═══════════════════════════════════════════════
   //  SCANNER
