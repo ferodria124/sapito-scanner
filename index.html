@@ -92,6 +92,13 @@
       margin-bottom: 2px;
     }
     .header-title {
+      .header-inner { flex-wrap: nowrap; gap: 10px; }
+      .logo { height: 30px; }
+      .logo-wrap { padding: 6px 8px; }
+      .header-eyebrow { font-size: 8px; letter-spacing: 1.5px; }
+      .header-title { font-size: 17px; }
+      .header-title .ver { font-size: 19px; }
+      .header-loc { font-size: 10px; }
       font-size: 20px; font-weight: 900; color: var(--gris-900);
       letter-spacing: -0.5px; line-height: 1;
     }
@@ -103,13 +110,7 @@
       font-size: 11px; color: var(--gris-500);
       margin-top: 3px; font-weight: 500;
     }
-    .header-badge {
-      flex-shrink: 0;
-      background: var(--azul-50);
-      border: 1px solid var(--azul-100);
-      border-radius: 20px; padding: 5px 12px;
-      font-size: 11px; font-weight: 700;
-      color: var(--azul-500); letter-spacing: 0.5px;
+    
     }
 
     /* ── MAIN ── */
@@ -443,7 +444,7 @@
         <div class="header-title">Control Sapito <span class="ver">3.0</span></div>
         <div class="header-loc">📍 Algarrobo</div>
       </div>
-      <div class="header-badge">BODEGA</div>
+     
     </div>
   </header>
 
