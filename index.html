@@ -87,7 +87,22 @@
     .header-loc { font-size: 11px; color: var(--gris-500); margin-top: 3px; font-weight: 500; }
 
     /* ── CACHE PILL ── */
-    
+    .cache-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 600; padding: 4px 10px;
+      border-radius: 20px; border: 1px solid var(--gris-200);
+      background: var(--gris-50); color: var(--gris-500);
+      transition: all 0.3s;
+    }
+    .cache-pill.loading { background: var(--azul-50); border-color: var(--azul-300); color: var(--azul-500); }
+    .cache-pill.ready   { background: var(--verde-bg); border-color: var(--verde); color: var(--verde); }
+    .cache-pill.error   { background: var(--rojo-bg); border-color: var(--rojo); color: var(--rojo); }
+    .cache-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+    }
+    .cache-dot.pulsing { animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
     /* ── MAIN ── */
     .main {
       flex: 1; max-width: 680px; width: 100%;
@@ -421,7 +436,7 @@
       <!-- Indicador de caché -->
       <div class="cache-pill" id="cachePill">
         <div class="cache-dot pulsing" id="cacheDot"></div>
-        <span id="cacheLabel">…</span>
+        <span id="cacheLabel">Cargando…</span>
       </div>
     </div>
   </header>
@@ -527,7 +542,7 @@
 
   // Inicia la carga en segundo plano apenas carga la página
   function cargarCache() {
-    setCachePill();
+    setCachePill('loading', 'Cargando…');
 
     // Pedimos todos los datos de Base de Datos al backend
     // (agregamos action=prefetch que devuelve array completo)
@@ -536,10 +551,10 @@
         Cache.bd   = data;                           // [{sku, desc, cod}]
         Cache.skus = [...new Set(data.map(r => r.sku).filter(Boolean))];
         Cache.listo = true;
-        setCachePill('ready', Cache.bd.length.toLocaleString;
+        setCachePill('ready', Cache.bd.length.toLocaleString('es-CL') + ' prods.');
       } else {
         Cache.error = true;
-        setCachePill();
+        setCachePill('error', 'Sin caché');
         // No rompemos la app: las búsquedas caen al backend normal
       }
     });
