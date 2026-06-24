@@ -55,7 +55,6 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
 
-    /* ── HEADER ── */
     .header {
       background: var(--blanco);
       box-shadow: 0 1px 8px rgba(0,0,0,0.07);
@@ -86,15 +85,12 @@
     .header-title .ver { color: var(--cian); font-size: 22px; }
     .header-loc { font-size: 11px; color: var(--gris-500); margin-top: 3px; font-weight: 500; }
 
-  
-    /* ── MAIN ── */
     .main {
       flex: 1; max-width: 680px; width: 100%;
       margin: 0 auto; padding: 20px 16px 40px;
       display: flex; flex-direction: column; gap: 14px;
     }
 
-    /* ── SEARCH CARD ── */
     .search-card {
       background: var(--blanco);
       border-radius: var(--radio);
@@ -131,13 +127,11 @@
     }
     .search-input::placeholder { color: #9ca3af; }
 
-    /* ── SUGGESTIONS — ESTABLE Y DESLIZABLE ── */
     .suggestions {
       position: absolute; top: calc(100% + 6px); left: 0; right: 0;
       background: var(--blanco); border: 1.5px solid var(--azul-400);
       border-radius: 11px; box-shadow: var(--sombra-lg);
       z-index: 200;
-      /* Scroll sin salirse */
       max-height: 320px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
@@ -145,7 +139,6 @@
     }
     .suggestions.hidden { display: none; }
 
-    /* Encabezado fijo dentro del dropdown */
     .sugg-header-sticky {
       position: sticky; top: 0;
       padding: 7px 14px;
@@ -162,7 +155,6 @@
       border-bottom: 1px solid var(--gris-100);
       transition: background 0.1s;
       min-height: 48px; display: flex; flex-direction: column; justify-content: center;
-      /* Evitar que el toque cierre el dropdown */
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
@@ -178,7 +170,6 @@
       vertical-align: middle; letter-spacing: 0.5px;
     }
 
-    /* Botones */
     .btn-cam {
       order: 2; flex-shrink: 0;
       width: 48px; height: 48px;
@@ -202,7 +193,6 @@
     .btn-consultar:active { transform: scale(0.97); opacity: 0.9; }
     .btn-consultar:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── RESULTADO ── */
     .resultado {
       background: var(--blanco); border-radius: var(--radio);
       overflow: hidden; box-shadow: var(--sombra);
@@ -360,6 +350,19 @@
     .scanner-status.success { background: linear-gradient(135deg, #064e3b, var(--verde)); }
     .scan-status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
     .scan-status-text strong { color: var(--blanco); display: block; font-size: 15px; }
+
+    /* Botón escanear de nuevo */
+    .btn-scan-again {
+      display: none;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3);
+      color: var(--blanco); border-radius: 20px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.15s;
+    }
+    .btn-scan-again:active { background: rgba(255,255,255,0.25); transform: scale(0.97); }
+
     .scanner-manual {
       background: #0d1117; padding: 10px 14px;
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
@@ -382,7 +385,6 @@
     }
     .btn-scan-ok:active { opacity: 0.85; }
 
-    /* ── Responsive ── */
     @media (max-width: 480px) {
       .header-title { font-size: 18px; }
       .header-title .ver { font-size: 20px; }
@@ -395,14 +397,12 @@
       .res-grid { grid-template-columns: 1fr; }
       .res-field.span2 { grid-column: 1; }
       .stock-num { font-size: 44px; }
-      /* Dropdown más chico en móvil para no tapar todo */
       .suggestions { max-height: 260px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div class="logo-wrap">
@@ -416,17 +416,14 @@
        <div class="header-eyebrow">Sistema de Inventario</div>
        <div class="header-title">Control Sapito <span class="ver">3.0</span></div>
        <div class="header-loc">📍 Algarrobo</div>
-       <!-- Indicador de caché -->
        <div class="cache-pill" id="cachePill" style="margin-top:6px; display:inline-flex;">
-       <div class="cache-dot pulsing" id="cacheDot"></div>
-       <span id="cacheLabel">…</span>
-  </div>
-</div>
+         <div class="cache-dot pulsing" id="cacheDot"></div>
+         <span id="cacheLabel">…</span>
+       </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="main">
     <div class="search-card">
       <div class="search-eyebrow">Consultar stock</div>
@@ -438,7 +435,6 @@
             placeholder="SKU, código madre o descripción…"
             autocomplete="off" class="search-input"
           />
-          <!-- Dropdown: pointer-events on para capturar toques sin cerrar -->
           <div id="suggestions" class="suggestions hidden"></div>
         </div>
         <button class="btn-cam" onclick="abrirScanner()" title="Escanear código">📷</button>
@@ -487,6 +483,7 @@
     <div class="scanner-status" id="scannerStatus">
       <span>🔍</span>
       <span class="scan-status-text" id="scannerStatusText">Buscando código de barras…</span>
+      <button class="btn-scan-again" id="btnScanAgain" onclick="reiniciarScanner()">📷 Escanear otro</button>
     </div>
     <div class="scanner-manual">
       <input type="number" inputmode="numeric" class="scan-manual-input"
@@ -502,7 +499,6 @@
   // ═══════════════════════════════════════════════
   const API = 'https://script.google.com/macros/s/AKfycbzKBa24qpv5CSVtu2hF_34HFg9AiQ_zGi8rf5Ph3nUW-58dS2fW_tCNdiZbrPRaAqdXAQ/exec';
 
-  
   function sugerirEnCacheSku(prefijo) {
     const res = [];
     const seen = new Set();
@@ -516,7 +512,7 @@
   }
 
   // ═══════════════════════════════════════════════
-  //  JSONP (fallback para buscarSKU)
+  //  JSONP
   // ═══════════════════════════════════════════════
   function jsonp(url, callback) {
     const fn = '_cb' + Date.now();
@@ -545,33 +541,23 @@
   let timeoutSugerencias;
 
   // ═══════════════════════════════════════════════
-  //  DROPDOWN — CONTROL DE APERTURA / CIERRE
-  //  Se cierra SOLO si el clic/toque es FUERA
-  //  del .input-wrap completo.
+  //  DROPDOWN
   // ═══════════════════════════════════════════════
-  let dropdownTouching = false; // bandera para evitar blur prematuro en móvil
+  let dropdownTouching = false;
 
   suggestions.addEventListener('touchstart', () => { dropdownTouching = true; }, { passive: true });
-  suggestions.addEventListener('touchend',   () => {
-    dropdownTouching = false;
-  }, { passive: true });
+  suggestions.addEventListener('touchend',   () => { dropdownTouching = false; }, { passive: true });
 
-  // Al perder el foco el input, esperamos un tick para saber si fue
-  // un toque dentro del dropdown (en cuyo caso NO cerramos)
   input.addEventListener('blur', () => {
     setTimeout(() => {
       if (!dropdownTouching) cerrarSugerencias();
     }, 150);
   });
 
-  // Clic fuera en desktop
   document.addEventListener('click', e => {
     if (!e.target.closest('.input-wrap')) cerrarSugerencias();
   });
 
-  // ═══════════════════════════════════════════════
-  //  TECLADO
-  // ═══════════════════════════════════════════════
   input.addEventListener('keydown', e => {
     const items = suggestions.querySelectorAll('.suggestion-item');
     if (e.key === 'ArrowDown') {
@@ -593,15 +579,11 @@
     }
   });
 
-  // ═══════════════════════════════════════════════
-  //  AUTOCOMPLETAR — usa caché local si está listo
-  // ═══════════════════════════════════════════════
   input.addEventListener('input', function() {
     clearTimeout(timeoutSugerencias);
     const val = this.value.trim();
     if (val.length < 2) { cerrarSugerencias(); return; }
 
-    // Si el caché ya está listo, respuesta instantánea (0 ms de red)
     if (Cache.listo) {
       const esNum = /^\d+$/.test(val);
       if (esNum && val.length >= 5) {
@@ -619,10 +601,9 @@
         const porDesc = buscarEnCacheDescripcion(val);
         porDesc.length ? mostrarSugerenciasDesc(porDesc, false) : cerrarSugerencias();
       }
-      return; // sin red
+      return;
     }
 
-    // Fallback: backend vía JSONP (cuando caché aún no cargó)
     timeoutSugerencias = setTimeout(() => {
       const esNum = /^\d+$/.test(val);
       if (esNum && val.length >= 5) {
@@ -673,12 +654,10 @@
     suggestions.classList.remove('hidden');
   }
 
-  // IMPORTANTE: usamos onmousedown (se ejecuta antes del blur del input)
-  // y también touchstart en el item para que funcione en móvil
   suggestions.addEventListener('touchstart', e => {
     const item = e.target.closest('.suggestion-item');
     if (item) {
-      e.preventDefault(); // evita blur del input y el posible cierre
+      e.preventDefault();
       elegirSugerencia(item.dataset.sku);
     }
   }, { passive: false });
@@ -696,7 +675,7 @@
   }
 
   // ═══════════════════════════════════════════════
-  //  BUSCAR (consulta stock — siempre al backend)
+  //  BUSCAR
   // ═══════════════════════════════════════════════
   function buscar() {
     const sku = input.value.trim();
@@ -774,19 +753,48 @@
   }
 
   // ═══════════════════════════════════════════════
-  //  SCANNER
+  //  SCANNER — CORRECCIÓN PRINCIPAL
+  //  Problema: escaneado=true quedaba pegado y el
+  //  scanner nunca se reiniciaba entre lecturas.
   // ═══════════════════════════════════════════════
-  let scanner   = null;
-  let escaneado = false;
+  let scanner      = null;
+  let escaneado    = false;
+  let camaraActual = null;
+  let configScanner = null;
 
   async function abrirScanner() {
+    // Resetear estado completamente antes de abrir
+    escaneado = false;
     document.getElementById('scannerOverlay').classList.remove('hidden');
-    document.getElementById('scannerStatus').className = 'scanner-status';
-    document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
+    _resetearUIScanner();
+    await _iniciarCamara();
+  }
+
+  function _resetearUIScanner() {
+    const bar = document.getElementById('scannerStatus');
+    bar.className = 'scanner-status';
+    bar.innerHTML = `
+      <span>🔍</span>
+      <span class="scan-status-text" id="scannerStatusText">Iniciando cámara…</span>
+      <button class="btn-scan-again hidden" id="btnScanAgain" onclick="reiniciarScanner()">📷 Escanear otro</button>
+    `;
+    document.getElementById('scannerManualInput').value = '';
+  }
+
+  async function _iniciarCamara() {
+    // Si ya hay un scanner activo, detenerlo limpiamente primero
+    if (scanner) {
+      try { await scanner.stop(); } catch(e) {}
+      scanner = null;
+    }
+
+    // Limpiar el contenedor del reader para evitar pantalla negra
+    const readerEl = document.getElementById('reader');
+    readerEl.innerHTML = '';
+
     escaneado = false;
 
-    scanner = new Html5Qrcode('reader');
-    const config = {
+    configScanner = {
       fps: 15,
       qrbox: { width: 280, height: 110 },
       formatsToSupport: [
@@ -799,53 +807,99 @@
       ]
     };
 
+    scanner = new Html5Qrcode('reader');
+
     try {
       const camaras = await Html5Qrcode.getCameras();
-      let camaraId;
 
       if (camaras.length > 1) {
         const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
-        camaraId = trasera ? trasera.id : camaras[camaras.length - 1].id;
+        camaraActual = (trasera ? trasera.id : camaras[camaras.length - 1].id);
 
-        const selector = document.createElement('select');
-        selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
-        camaras.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.id; opt.textContent = c.label || `Cámara ${c.id}`;
-          if (c.id === camaraId) opt.selected = true;
-          selector.appendChild(opt);
-        });
-        selector.addEventListener('change', async () => {
-          await scanner.stop();
-          await scanner.start(selector.value, config, d => { if (!escaneado) exitoScanner(d); }, () => {});
-        });
-        document.querySelector('.scanner-viewport').appendChild(selector);
+        // Selector de cámara (solo si no existe ya)
+        if (!document.querySelector('.scanner-viewport select')) {
+          const selector = document.createElement('select');
+          selector.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
+          camaras.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id; opt.textContent = c.label || `Cámara ${c.id}`;
+            if (c.id === camaraActual) opt.selected = true;
+            selector.appendChild(opt);
+          });
+          selector.addEventListener('change', async () => {
+            camaraActual = selector.value;
+            await _iniciarCamara();
+          });
+          document.querySelector('.scanner-viewport').appendChild(selector);
+        }
       } else {
-        camaraId = camaras[0]?.id || { facingMode: 'environment' };
+        camaraActual = camaras[0]?.id || { facingMode: 'environment' };
       }
 
-      await scanner.start(camaraId, config,
+      await scanner.start(
+        camaraActual,
+        configScanner,
         decoded => { if (!escaneado) exitoScanner(decoded); },
         () => {}
       );
-      document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
+
+      const statusText = document.getElementById('scannerStatusText');
+      if (statusText) statusText.textContent = 'Buscando código de barras…';
+
     } catch(err) {
-      document.getElementById('scannerStatusText').innerHTML =
-        '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
+      const bar = document.getElementById('scannerStatus');
+      if (bar) bar.innerHTML = `
+        <span>⚠️</span>
+        <span class="scan-status-text">
+          <strong style="color:#fca5a5">Sin acceso a cámara</strong>
+          Usa el campo de abajo
+        </span>`;
     }
   }
 
   function exitoScanner(codigo) {
+    // Marcar como escaneado para ignorar lecturas duplicadas del mismo frame
     escaneado = true;
     if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
     const bar = document.getElementById('scannerStatus');
     bar.className = 'scanner-status success';
-    bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
-    setTimeout(() => { cerrarScanner(); input.value = codigo; buscar(); }, 900);
+    bar.innerHTML = `
+      <span>✅</span>
+      <span class="scan-status-text">
+        <strong>${esc(codigo)}</strong>
+        ¡Escaneado! Cerrando…
+      </span>
+    `;
+
+    // Cerrar, rellenar input y buscar
+    setTimeout(async () => {
+      await _detenerCamara();
+      document.getElementById('scannerOverlay').classList.add('hidden');
+      input.value = codigo;
+      buscar();
+    }, 900);
   }
 
-  function cerrarScanner() {
-    if (scanner) { scanner.stop().catch(() => {}).finally(() => { scanner = null; }); }
+  // Reiniciar scanner sin cerrar el overlay (para escanear otro)
+  async function reiniciarScanner() {
+    escaneado = false;
+    _resetearUIScanner();
+    await _iniciarCamara();
+  }
+
+  async function _detenerCamara() {
+    if (scanner) {
+      try { await scanner.stop(); } catch(e) {}
+      scanner = null;
+    }
+    // Limpiar reader para evitar pantalla negra en próxima apertura
+    document.getElementById('reader').innerHTML = '';
+  }
+
+  async function cerrarScanner() {
+    await _detenerCamara();
+    // Remover selector de cámara si existe
     document.querySelector('.scanner-viewport select')?.remove();
     document.getElementById('scannerOverlay').classList.add('hidden');
     document.getElementById('scannerManualInput').value = '';
@@ -868,7 +922,6 @@
     return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ── Arranque ──
   cargarCache();
   </script>
 </body>
