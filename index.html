@@ -756,20 +756,6 @@ async function abrirScanner() {
       '<strong style="color:#fca5a5">Cámara no disponible</strong>Usa el campo de abajo';
   }
 }
-async function iniciarCamara(camaraId, config) {
-  document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
-  try {
-    await scanner.start(
-      camaraId, config,
-      decoded => { if (!escaneado) exitoScanner(decoded); },
-      () => {}
-    );
-    document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
-  } catch(err) {
-    document.getElementById('scannerStatusText').innerHTML =
-      '<strong style="color:#fca5a5">Error al iniciar cámara</strong>Usa el campo de abajo';
-  }
-}
 
 async function iniciarCamaraScanner(camaraId, config) {
   document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
