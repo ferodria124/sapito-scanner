@@ -715,66 +715,45 @@
     // ── SCANNER ──
 async function abrirScanner() {
   document.getElementById('scannerOverlay').classList.remove('hidden');
-  document.getElementById('scannerStatus').className = 'scanner-status';
-  document.getElementById('scannerStatusText').textContent = 'Detectando cámaras…';
-  
-  // ✅ Reset ANTES de crear la instancia
+  document.getElementById('scannerStatusText').textContent = 'Solicitando permiso…';
   escaneado = false;
-  
-  // ✅ Destruir instancia previa si existe
+
   if (scanner) {
     try { await scanner.stop(); } catch(e) {}
     try { await scanner.clear(); } catch(e) {}
     scanner = null;
   }
-  
-  scanner = new Html5Qrcode('reader');
 
+  // ✅ Pedir permiso PRIMERO con la API nativa
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    stream.getTracks().forEach(t => t.stop()); // soltar el stream, solo era para el permiso
+  } catch(err) {
+    console.error('Permiso de cámara denegado:', err);
+    document.getElementById('scannerStatusText').innerHTML =
+      '<strong style="color:#fca5a5">Permiso de cámara denegado</strong>Actívalo en el candado 🔒';
+    return;
+  }
+
+  scanner = new Html5Qrcode('reader');
   const config = {
     fps: 15,
-    qrbox: { width: 250, height: 150 }, // ✅ Más alto, más fácil de encuadrar
-    // ✅ Sin formatsToSupport — detecta todos por defecto (más robusto)
+    qrbox: { width: 250, height: 150 },
   };
 
   try {
-    const camaras = await Html5Qrcode.getCameras();
+    const camaras = await Html5Qrcode.getCameras(); // ✅ Ahora sí tiene permiso
     if (!camaras || camaras.length === 0) throw new Error('No se encontraron cámaras.');
-    
+
     if (camaras.length === 1) {
       iniciarCamara(camaras[0].id, config);
     } else {
       mostrarSelectorCamaras(camaras, config);
     }
   } catch(err) {
-    console.error('getCameras error:', err); // ✅ Loguear para debuggear
+    console.error('getCameras error:', err);
     document.getElementById('scannerStatusText').innerHTML =
-      '<strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo';
-  }
-}
-
-async function iniciarCamara(camaraId, config) {
-  document.getElementById('scannerStatusText').textContent = 'Iniciando cámara…';
-  try {
-    await scanner.start(
-      camaraId,
-      config,
-      (decoded, result) => {
-        console.log('✅ Scan exitoso:', decoded, result); // ✅ Verificar que llega
-        if (!escaneado) exitoScanner(decoded);
-      },
-      (errorMsg) => {
-        // Solo loguear errores inesperados, no los de "frame sin código"
-        if (!errorMsg.includes('No MultiFormat Readers') && 
-            !errorMsg.includes('NotFoundException')) {
-          console.warn('Scanner error:', errorMsg);
-        }
-      }
-    );
-    document.getElementById('scannerStatusText').textContent = 'Buscando código de barras…';
-  } catch(err) {
-    console.error('iniciarCamara error:', err); // ✅ Ver el error real
-    document.getElementById('scannerStatusText').innerHTML =
-      '<strong style="color:#fca5a5">Error al iniciar cámara</strong>Usa el campo de abajo';
+      '<strong style="color:#fca5a5">Cámara no disponible</strong>Usa el campo de abajo';
   }
 }
 async function iniciarCamara(camaraId, config) {
