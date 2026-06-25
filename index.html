@@ -385,6 +385,50 @@
       .res-field.span2 { grid-column: 1; }
       .stock-num { font-size: 44px; }
       .suggestions { max-height: 220px; }
+
+    /* ── SELECTOR DE CÁMARA ── */
+    .scanner-cam-selector {
+      background: #0d1117;
+      adding: 16px 20px;
+      flex-shrink: 0;
+      border-bottom: 1px solid #1e2d3d;
+    }
+    .scanner-cam-selector.hidden { display: none; }
+    .scanner-cam-selector p {
+      font-size: 12px; color: rgba(255,255,255,0.5);
+      margin-bottom: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .cam-lista { display: flex; flex-direction: column; gap: 8px; }
+    .btn-camara {
+      width: 100%; padding: 13px 16px;
+      border-radius: 10px;
+      border: 1px solid #30363d;
+      background: #161b22;
+      font-family: var(--font);
+      font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      cursor: pointer; text-align: left;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-camara:hover,
+    .btn-camara:active { border-color: var(--azul-400); background: rgba(37,99,235,0.15); }
+    .btn-camara.activa {
+      border-color: var(--verde); background: rgba(22,163,74,0.15);
+      color: #4ade80; font-weight: 700;
+    }
+
+    /* ── BOTÓN CAMBIAR CÁMARA en barra de estado ── */
+     .btn-cambiar-cam {
+       background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+       color: var(--blanco); font-size: 12px; font-weight: 700;
+       padding: 6px 12px; border-radius: 16px; cursor: pointer;
+       white-space: nowrap; flex-shrink: 0;
+       -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+    }
+     .btn-cambiar-cam:active { background: rgba(255,255,255,0.2); }
+     .btn-cambiar-cam.hidden { display: none; }
     }
   </style>
 </head>
@@ -439,43 +483,53 @@
     Control Sapito 3.0 &nbsp;·&nbsp; CasaIdeas Algarrobo
   </footer>
 
-  <!-- SCANNER -->
-  <div id="scannerOverlay" class="scanner-overlay hidden">
-    <div class="scanner-header">
-      <div>
-        <div class="scanner-title">📷 Escáner de código de barras</div>
-        <div class="scanner-sub">Control Sapito 3.0 · Algarrobo</div>
+  
+  <!-- SCANNER OVERLAY -->
+<div id="scannerOverlay" class="scanner-overlay hidden">
+
+  <div class="scanner-header">
+    <div>
+      <div class="scanner-title">📷 Escáner de código de barras</div>
+      <div class="scanner-sub">Control Sapito 3.0 · Algarrobo</div>
+    </div>
+    <button class="btn-cerrar-scan" id="btnCerrarScanner">✕ Cerrar</button>
+  </div>
+
+  <!-- Panel selector de cámara (visible solo si hay más de una) -->
+  <div class="scanner-cam-selector hidden" id="panelSelectorCam">
+    <p>Elige la cámara que quieres usar:</p>
+    <div class="cam-lista" id="listaCamaras"></div>
+  </div>
+
+  <div class="scanner-viewport">
+    <div id="reader"></div>
+    <div class="scan-ui">
+      <div class="s-dark-top"></div>
+      <div class="s-dark-bottom"></div>
+      <div class="s-dark-left"></div>
+      <div class="s-dark-right"></div>
+      <div class="s-window">
+        <span class="s-corner tl"></span>
+        <span class="s-corner tr"></span>
+        <span class="s-corner bl"></span>
+        <span class="s-corner br"></span>
+        <div class="s-line"></div>
       </div>
-      <button class="btn-cerrar-scan" onclick="cerrarScanner()">✕ Cerrar</button>
-    </div>
-    <div class="scanner-viewport">
-      <div id="reader"></div>
-      <div class="scan-ui">
-        <div class="s-dark-top"></div>
-        <div class="s-dark-bottom"></div>
-        <div class="s-dark-left"></div>
-        <div class="s-dark-right"></div>
-        <div class="s-window">
-          <span class="s-corner tl"></span>
-          <span class="s-corner tr"></span>
-          <span class="s-corner bl"></span>
-          <span class="s-corner br"></span>
-          <div class="s-line"></div>
-        </div>
-        <div class="s-hint">Centra el código de barras dentro del recuadro</div>
-      </div>
-    </div>
-    <div class="scanner-status" id="scannerStatus">
-      <span>🔍</span>
-      <span class="scan-status-text" id="scannerStatusText">Buscando código de barras…</span>
-    </div>
-    <div class="scanner-manual">
-      <input type="number" inputmode="numeric" class="scan-manual-input"
-        id="scannerManualInput" placeholder="O escribe el SKU manualmente…"/>
-      <button class="btn-scan-ok" onclick="confirmarManualScanner()">✓ OK</button>
+      <div class="s-hint">Centra el código de barras dentro del recuadro</div>
     </div>
   </div>
 
+  <div class="scanner-status" id="scannerStatus">
+    <span class="scan-status-text" id="scannerStatusText">Iniciando…</span>
+    <button class="btn-cambiar-cam hidden" id="btnCambiarCam">🔄 Cambiar cámara</button>
+  </div>
+
+  <div class="scanner-manual">
+    <input type="number" inputmode="numeric" class="scan-manual-input"
+      id="scannerManualInput" placeholder="O escribe el SKU manualmente…"/>
+    <button class="btn-scan-ok" onclick="confirmarManualScanner()">✓ OK</button>
+  </div>
+</div>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
   'use strict';
@@ -867,114 +921,156 @@
 }
 
   // ═══════════════════════════════════════════════
-  //  SCANNER
-  // ═══════════════════════════════════════════════
-  let scanner      = null;
-  let escaneado    = false;
-  let camaraActual = null;
+//  SCANNER
+// ═══════════════════════════════════════════════
+const scannerStatusEl  = document.getElementById('scannerStatus');
+const scannerStatusTx  = document.getElementById('scannerStatusText');
+const panelSelectorCam = document.getElementById('panelSelectorCam');
+const listaCamarasEl   = document.getElementById('listaCamaras');
+const btnCambiarCam    = document.getElementById('btnCambiarCam');
 
-  async function abrirScanner() {
-    escaneado = false;
-    document.getElementById('scannerOverlay').classList.remove('hidden');
-    _resetUIScanner();
-    await _iniciarCamara();
+let html5QrCode        = null;
+let scannerActivo      = false;
+let camarasDisponibles = [];
+let camaraActualId     = null;
+
+document.querySelector('.btn-cam').addEventListener('click', abrirScanner);
+document.getElementById('btnCerrarScanner').addEventListener('click', cerrarScanner);
+btnCambiarCam.addEventListener('click', mostrarSelectorCamara);
+
+async function abrirScanner() {
+  document.getElementById('scannerOverlay').classList.remove('hidden');
+  panelSelectorCam.classList.add('hidden');
+  btnCambiarCam.classList.add('hidden');
+  scannerStatusEl.className = 'scanner-status';
+  scannerStatusTx.textContent = 'Buscando cámaras disponibles…';
+
+  try {
+    camarasDisponibles = await Html5Qrcode.getCameras();
+  } catch (err) {
+    scannerStatusTx.innerHTML =
+      '<strong style="color:#fca5a5">Permiso de cámara denegado</strong> Actívalo en ajustes o usa el campo de abajo.';
+    return;
   }
 
-  function _resetUIScanner() {
-    const bar = document.getElementById('scannerStatus');
-    bar.className = 'scanner-status';
-    bar.innerHTML = `<span>🔍</span><span class="scan-status-text" id="scannerStatusText">Iniciando cámara…</span>`;
-    document.getElementById('scannerManualInput').value = '';
+  if (!camarasDisponibles || camarasDisponibles.length === 0) {
+    scannerStatusTx.textContent = 'No se encontró ninguna cámara en este dispositivo.';
+    return;
   }
 
-  async function _iniciarCamara() {
-    if (scanner) {
-      try { await scanner.stop(); } catch(e) {}
-      scanner = null;
-    }
-    document.getElementById('reader').innerHTML = '';
-    escaneado = false;
+  camarasDisponibles.length === 1
+    ? await iniciarCamara(camarasDisponibles[0].id)
+    : mostrarSelectorCamara();
+}
 
-    const config = {
-      fps: 15,
-      qrbox: { width: 280, height: 110 },
-      formatsToSupport: [
-        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
-        Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
-        Html5QrcodeSupportedFormats.UPC_A,  Html5QrcodeSupportedFormats.UPC_E,
-      ]
-    };
+function mostrarSelectorCamara() {
+  if (scannerActivo) detenerCamaraActual();
 
-    scanner = new Html5Qrcode('reader');
-    try {
-      const camaras = await Html5Qrcode.getCameras();
-      if (camaras.length > 1) {
-        const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
-        camaraActual = trasera ? trasera.id : camaras[camaras.length - 1].id;
+  listaCamarasEl.innerHTML = '';
+  camarasDisponibles.forEach(cam => {
+    const btn = document.createElement('button');
+    const label = cam.label || '';
+    let nombre = label;
+    if (!nombre || /facing back|environment/i.test(nombre))  nombre = '📷 Cámara trasera';
+    else if (/facing front|user/i.test(nombre))              nombre = '🤳 Cámara frontal';
+    else nombre = '📷 ' + (label.length > 42 ? label.substring(0, 42) + '…' : label);
 
-        if (!document.querySelector('.scanner-viewport select')) {
-          const sel = document.createElement('select');
-          sel.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
-          camaras.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id; opt.textContent = c.label || `Cámara ${c.id}`;
-            if (c.id === camaraActual) opt.selected = true;
-            sel.appendChild(opt);
-          });
-          sel.addEventListener('change', async () => { camaraActual = sel.value; await _iniciarCamara(); });
-          document.querySelector('.scanner-viewport').appendChild(sel);
-        }
-      } else {
-        camaraActual = camaras[0]?.id || { facingMode: 'environment' };
-      }
-
-      await scanner.start(camaraActual, config,
-        decoded => { if (!escaneado) exitoScanner(decoded); },
-        () => {}
-      );
-      const st = document.getElementById('scannerStatusText');
-      if (st) st.textContent = 'Buscando código de barras…';
-    } catch(err) {
-      const bar = document.getElementById('scannerStatus');
-      bar.innerHTML = `<span>⚠️</span><span class="scan-status-text"><strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo</span>`;
-    }
-  }
-
-  function exitoScanner(codigo) {
-    escaneado = true;
-    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    const bar = document.getElementById('scannerStatus');
-    bar.className = 'scanner-status success';
-    bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
-    setTimeout(async () => {
-      await _detenerCamara();
-      document.getElementById('scannerOverlay').classList.add('hidden');
-      inputEl.value = codigo;
-      buscar();
-    }, 900);
-  }
-
-  async function _detenerCamara() {
-    if (scanner) { try { await scanner.stop(); } catch(e) {} scanner = null; }
-    document.getElementById('reader').innerHTML = '';
-  }
-
-  async function cerrarScanner() {
-    await _detenerCamara();
-    document.querySelector('.scanner-viewport select')?.remove();
-    document.getElementById('scannerOverlay').classList.add('hidden');
-    document.getElementById('scannerManualInput').value = '';
-    escaneado = false;
-  }
-
-  function confirmarManualScanner() {
-    const val = document.getElementById('scannerManualInput').value.trim();
-    if (val) exitoScanner(val);
-  }
-  document.getElementById('scannerManualInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') confirmarManualScanner();
+    btn.className   = 'btn-camara' + (cam.id === camaraActualId ? ' activa' : '');
+    btn.textContent = nombre + (cam.id === camaraActualId ? '  ✓ en uso' : '');
+    btn.type        = 'button';
+    btn.addEventListener('click', () => iniciarCamara(cam.id));
+    listaCamarasEl.appendChild(btn);
   });
 
+  panelSelectorCam.classList.remove('hidden');
+  document.getElementById('reader').innerHTML = '';
+  scannerStatusTx.textContent = 'Elige la cámara que quieres usar:';
+  scannerStatusEl.className   = 'scanner-status';
+  btnCambiarCam.classList.add('hidden');
+}
+
+async function iniciarCamara(camaraId) {
+  panelSelectorCam.classList.add('hidden');
+  scannerStatusTx.textContent = 'Iniciando cámara…';
+  scannerStatusEl.className   = 'scanner-status';
+
+  await detenerCamaraActual();
+
+  try {
+    html5QrCode = new Html5Qrcode('reader', {
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.ITF,
+        Html5QrcodeSupportedFormats.CODABAR,
+      ],
+      verbose: false,
+    });
+
+    await html5QrCode.start(
+      camaraId,
+      { fps: 12, qrbox: { width: 280, height: 110 }, aspectRatio: 1.5 },
+      onScanExitoso,
+      () => {}
+    );
+
+    scannerActivo  = true;
+    camaraActualId = camaraId;
+    scannerStatusTx.textContent = 'Buscando código de barras…';
+    if (camarasDisponibles.length > 1) btnCambiarCam.classList.remove('hidden');
+
+  } catch (err) {
+    let mensaje = 'No se pudo iniciar esta cámara.';
+    if (String(err).toLowerCase().includes('permission'))
+      mensaje = 'Permiso de cámara denegado. Actívalo en la configuración del navegador.';
+    scannerStatusTx.textContent = mensaje;
+    if (camarasDisponibles.length > 1) setTimeout(mostrarSelectorCamara, 1500);
+  }
+}
+
+async function detenerCamaraActual() {
+  if (html5QrCode && scannerActivo) {
+    try { await html5QrCode.stop(); } catch (_) {}
+    html5QrCode   = null;
+    scannerActivo = false;
+  }
+  document.getElementById('reader').innerHTML = '';
+}
+
+async function onScanExitoso(codigo) {
+  if (!scannerActivo) return;
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+  scannerStatusEl.className    = 'scanner-status success';
+  scannerStatusTx.innerHTML    = `<strong>${esc(codigo)}</strong>¡Escaneado!`;
+  btnCambiarCam.classList.add('hidden');
+  setTimeout(async () => {
+    await cerrarScanner();
+    input.value = codigo;
+    buscar();
+  }, 900);
+}
+
+async function cerrarScanner() {
+  await detenerCamaraActual();
+  panelSelectorCam.classList.add('hidden');
+  btnCambiarCam.classList.add('hidden');
+  scannerStatusTx.textContent = '';
+  document.getElementById('scannerManualInput').value = '';
+  document.getElementById('scannerOverlay').classList.add('hidden');
+}
+
+function confirmarManualScanner() {
+  const val = document.getElementById('scannerManualInput').value.trim();
+  if (val) onScanExitoso(val);
+}
+
+document.getElementById('scannerManualInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmarManualScanner();
+});
   // ═══════════════════════════════════════════════
   //  UTIL
   // ═══════════════════════════════════════════════
